@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
-import { Layout, Text, Button, Select, SelectItem, Input } from '@ui-kitten/components';
+import { Layout, Text, Button, Input } from '@ui-kitten/components';
 import { useExpenseStore } from '../store/index.js';
 
 export default function AddExpenseModal({ visible, onClose }) {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(null);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [date, setDate] = useState(new Date().toLocaleDateString());
   const { categories, addExpense } = useExpenseStore();
 
@@ -16,19 +17,25 @@ export default function AddExpenseModal({ visible, onClose }) {
     if (visible) {
       setAmount('');
       setDescription('');
-      setSelectedCategory(null);
+      setSelectedCategoryIndex(null);
+      setShowCategoryPicker(false);
       setDate(new Date().toLocaleDateString());
     }
   }, [visible]);
 
+  const handleCategorySelect = (index) => {
+    setSelectedCategoryIndex(index);
+    setShowCategoryPicker(false);
+  };
+
   const handleSave = () => {
-    if (!amount || !selectedCategory) {
+    if (!amount || selectedCategoryIndex === null) {
       return;
     }
     const expense = {
       id: Date.now().toString(),
       amount: parseFloat(amount),
-      category: categories[selectedCategory.row],
+      category: categories[selectedCategoryIndex],
       description,
       date: new Date().toISOString(),
     };
@@ -61,27 +68,24 @@ export default function AddExpenseModal({ visible, onClose }) {
               placeholder='0.00'
               label='Amount ($)'
               value={amount}
-              onChangeText={(text) => {
-                console.log('Amount changed:', text);
-                setAmount(text);
-              }}
+              onChangeText={setAmount}
               keyboardType='decimal-pad'
               returnKeyType="next"
-              autoFocus
             />
 
-            <Select
-              style={styles.input}
-              placeholder='Select Category'
-              label='Category'
-              value={selectedCategory ? categories[selectedCategory.row] : null}
-              selectedIndex={selectedCategory}
-              onSelect={(index) => setSelectedCategory(index)}
-            >
-              {categories.map((category, index) => (
-                <SelectItem key={index} title={category} />
-              ))}
-            </Select>
+            <View style={styles.input}>
+              <Text category='label' style={styles.label}>Category</Text>
+              <TouchableOpacity
+                style={styles.categoryButton}
+                onPress={() => setShowCategoryPicker(true)}
+              >
+                <Text style={styles.categoryButtonText}>
+                  {selectedCategoryIndex !== null 
+                    ? categories[selectedCategoryIndex] 
+                    : 'Select Category'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             <Input
               style={styles.input}
@@ -111,12 +115,33 @@ export default function AddExpenseModal({ visible, onClose }) {
             <Button
               style={styles.button}
               onPress={handleSave}
-              disabled={!amount || !selectedCategory}
+              disabled={!amount || selectedCategoryIndex === null}
             >
               Save
             </Button>
           </View>
         </Layout>
+
+        {/* Category Picker Modal */}
+        <Modal
+          isVisible={showCategoryPicker}
+          onBackdropPress={() => setShowCategoryPicker(false)}
+          onBackButtonPress={() => setShowCategoryPicker(false)}
+          style={styles.categoryModal}
+        >
+          <Layout style={styles.categoryContainer}>
+            <Text category='h6' style={styles.categoryTitle}>Select Category</Text>
+            {categories.map((category, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.categoryOption}
+                onPress={() => handleCategorySelect(index)}
+              >
+                <Text style={styles.categoryOptionText}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+          </Layout>
+        </Modal>
     </Modal>
   );
 }
@@ -147,6 +172,23 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 16,
   },
+  label: {
+    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#8F9BB3',
+  },
+  categoryButton: {
+    borderWidth: 1,
+    borderColor: '#E4E9F2',
+    borderRadius: 4,
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+  },
+  categoryButtonText: {
+    fontSize: 16,
+    color: '#222B45',
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -157,5 +199,28 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     marginHorizontal: 8,
+  },
+  categoryModal: {
+    justifyContent: 'center',
+    margin: 20,
+  },
+  categoryContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 20,
+    maxHeight: 400,
+  },
+  categoryTitle: {
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  categoryOption: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E9F2',
+  },
+  categoryOptionText: {
+    fontSize: 16,
+    color: '#222B45',
   },
 });

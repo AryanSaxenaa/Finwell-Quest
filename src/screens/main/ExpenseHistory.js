@@ -3,7 +3,6 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { 
   Layout, 
   Text, 
-  List, 
   ListItem, 
   TopNavigation,
   TopNavigationAction,
@@ -21,18 +20,6 @@ export default function ExpenseHistory({ navigation }) {
     <TopNavigationAction 
       icon={BackIcon} 
       onPress={() => navigation.goBack()} 
-    />
-  );
-
-  const renderExpenseItem = ({ item }) => (
-    <ListItem
-      title={item.description || item.category}
-      description={new Date(item.date).toLocaleDateString()}
-      accessoryRight={() => (
-        <Text category='s1' style={{ color: '#E74C3C' }}>
-          -${item.amount.toFixed(2)}
-        </Text>
-      )}
     />
   );
 
@@ -79,10 +66,20 @@ export default function ExpenseHistory({ navigation }) {
             Recent Transactions ({expenses.length})
           </Text>
           {expenses.length > 0 ? (
-            <List
-              data={expenses.slice().reverse()}
-              renderItem={renderExpenseItem}
-            />
+            <View>
+              {expenses.slice().reverse().map((expense, index) => (
+                <ListItem
+                  key={expense.id || index}
+                  title={expense.description || expense.category}
+                  description={new Date(expense.date).toLocaleDateString()}
+                  accessoryRight={() => (
+                    <Text category='s1' style={{ color: '#E74C3C' }}>
+                      -${expense.amount.toFixed(2)}
+                    </Text>
+                  )}
+                />
+              ))}
+            </View>
           ) : (
             <Text style={styles.noData}>No expenses recorded yet</Text>
           )}
