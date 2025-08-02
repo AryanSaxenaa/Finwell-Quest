@@ -14,6 +14,7 @@ import {
   TopNavigationAction 
 } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
+import { PieChart } from 'react-native-chart-kit';
 import { useExpenseStore, useGameStore } from '../../store';
 import AddExpenseModal from '../../components/AddExpenseModal';
 
@@ -31,6 +32,27 @@ export default function HomeDashboard({ navigation }) {
   const { level, xp } = useGameStore();
   
   const categoryData = getExpensesByCategory().filter(item => item.total > 0);
+
+  // Prepare chart data
+  const chartColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+  const pieChartData = categoryData.map((item, index) => ({
+    name: item.category,
+    amount: item.total,
+    color: chartColors[index % chartColors.length],
+    legendFontColor: '#222B45',
+    legendFontSize: 12,
+  }));
+
+  const chartConfig = {
+    backgroundColor: '#ffffff',
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    color: (opacity = 1) => `rgba(34, 43, 69, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(34, 43, 69, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.5,
+    useShadowColorFromDataset: false,
+  };
 
   const renderMenuAction = () => (
     <TopNavigationAction 
@@ -59,14 +81,26 @@ export default function HomeDashboard({ navigation }) {
       
       {categoryData.length > 0 ? (
         <View style={styles.chartContainer}>
-          <Text style={styles.chartPlaceholder}>📊 Chart View</Text>
-          <Text style={styles.chartNote}>Interactive charts coming soon!</Text>
-          {categoryData.map((item, index) => (
-            <View key={index} style={styles.categoryItem}>
-              <Text>{item.category}</Text>
-              <Text style={styles.categoryAmount}>${item.total.toFixed(2)}</Text>
-            </View>
-          ))}
+          <PieChart
+            data={pieChartData}
+            width={width - 80}
+            height={200}
+            chartConfig={chartConfig}
+            accessor="amount"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            center={[10, 0]}
+            hasLegend={true}
+          />
+          <View style={styles.categoryList}>
+            {categoryData.map((item, index) => (
+              <View key={index} style={styles.categoryItem}>
+                <View style={[styles.categoryDot, { backgroundColor: chartColors[index % chartColors.length] }]} />
+                <Text style={styles.categoryName}>{item.category}</Text>
+                <Text style={styles.categoryAmount}>${item.total.toFixed(2)}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       ) : (
         <Text style={styles.noData}>No expenses recorded yet</Text>
@@ -192,26 +226,32 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
   },
-  chartPlaceholder: {
-    fontSize: 48,
-    marginBottom: 8,
-  },
-  chartNote: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginBottom: 16,
+  categoryList: {
+    width: '100%',
+    marginTop: 16,
   },
   categoryItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 8,
     paddingHorizontal: 16,
     backgroundColor: '#F8F9FA',
     marginVertical: 2,
     borderRadius: 8,
     width: '100%',
+  },
+  categoryDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 12,
+  },
+  categoryName: {
+    flex: 1,
+    fontSize: 14,
+    color: '#222B45',
   },
   categoryAmount: {
     fontWeight: 'bold',

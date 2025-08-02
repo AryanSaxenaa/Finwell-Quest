@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { 
   Layout, 
   Text, 
@@ -9,7 +9,10 @@ import {
   Card 
 } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
+import { BarChart } from 'react-native-chart-kit';
 import { useExpenseStore } from '../../store';
+
+const { width } = Dimensions.get('window');
 
 const BackIcon = (props) => <Ionicons name="arrow-back" size={24} color="#8F9BB3" />;
 
@@ -37,6 +40,31 @@ export default function ExpenseHistory({ navigation }) {
     amount,
   }));
 
+  // Prepare bar chart data
+  const barChartData = {
+    labels: chartData.map(item => item.month),
+    datasets: [{
+      data: chartData.map(item => item.amount)
+    }]
+  };
+
+  const chartConfig = {
+    backgroundColor: '#ffffff',
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(108, 92, 231, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(34, 43, 69, ${opacity})`,
+    style: {
+      borderRadius: 16
+    },
+    propsForDots: {
+      r: "6",
+      strokeWidth: "2",
+      stroke: "#6C5CE7"
+    }
+  };
+
   return (
     <Layout style={styles.container}>
       <TopNavigation
@@ -47,13 +75,26 @@ export default function ExpenseHistory({ navigation }) {
       <ScrollView style={styles.content}>
         {chartData.length > 0 && (
           <Card style={styles.chartCard}>
-            <Text category='h6' style={styles.chartTitle}>Monthly Spending</Text>
-            <View style={styles.chartPlaceholder}>
-              <Text style={styles.chartIcon}>📊</Text>
-              <Text style={styles.chartNote}>Interactive charts coming soon!</Text>
+            <Text category='h6' style={styles.chartTitle}>Monthly Spending Trends</Text>
+            <View style={styles.chartContainer}>
+              <BarChart
+                data={barChartData}
+                width={width - 60}
+                height={220}
+                chartConfig={chartConfig}
+                verticalLabelRotation={30}
+                showValuesOnTopOfBars={true}
+                fromZero={true}
+                style={{
+                  marginVertical: 8,
+                  borderRadius: 16
+                }}
+              />
+            </View>
+            <View style={styles.monthlyBreakdown}>
               {chartData.map((item, index) => (
                 <View key={index} style={styles.monthItem}>
-                  <Text>{item.month}</Text>
+                  <Text style={styles.monthLabel}>{item.month}</Text>
                   <Text style={styles.monthAmount}>${item.amount.toFixed(2)}</Text>
                 </View>
               ))}
@@ -105,18 +146,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontWeight: 'bold',
   },
-  chartPlaceholder: {
+  chartContainer: {
     alignItems: 'center',
-    padding: 20,
+    marginVertical: 10,
   },
-  chartIcon: {
-    fontSize: 48,
-    marginBottom: 8,
-  },
-  chartNote: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginBottom: 16,
+  monthlyBreakdown: {
+    marginTop: 16,
   },
   monthItem: {
     flexDirection: 'row',
@@ -127,6 +162,10 @@ const styles = StyleSheet.create({
     marginVertical: 2,
     borderRadius: 8,
     width: '100%',
+  },
+  monthLabel: {
+    fontSize: 14,
+    color: '#222B45',
   },
   monthAmount: {
     fontWeight: 'bold',
