@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomNavigation, BottomNavigationTab } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet } from 'react-native';
 import HomeStackNavigator from './HomeStackNavigator';
 import GameStackNavigator from './GameStackNavigator';
 import LearnStackNavigator from './LearnStackNavigator';
@@ -18,11 +19,28 @@ const BottomTabBar = ({ navigation, state }) => (
   <BottomNavigation
     selectedIndex={state.index}
     onSelect={index => navigation.navigate(state.routeNames[index])}
+    style={styles.bottomNavigation}
   >
-    <BottomNavigationTab title='Home' icon={HomeIcon} />
-    <BottomNavigationTab title='Game' icon={GameIcon} />
-    <BottomNavigationTab title='Learn' icon={LearnIcon} />
-    <BottomNavigationTab title='Social' icon={SocialIcon} />
+    <BottomNavigationTab 
+      title='Home' 
+      icon={HomeIcon} 
+      style={styles.bottomTab}
+    />
+    <BottomNavigationTab 
+      title='Game' 
+      icon={GameIcon} 
+      style={styles.bottomTab}
+    />
+    <BottomNavigationTab 
+      title='Learn' 
+      icon={LearnIcon} 
+      style={styles.bottomTab}
+    />
+    <BottomNavigationTab 
+      title='Social' 
+      icon={SocialIcon} 
+      style={styles.bottomTab}
+    />
   </BottomNavigation>
 );
 
@@ -39,3 +57,15 @@ export default function MainTabNavigator() {
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  bottomNavigation: {
+    paddingVertical: 8,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  bottomTab: {
+    paddingVertical: 4,
+  },
+});
