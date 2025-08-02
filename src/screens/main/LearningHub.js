@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Layout, Text, Button, Card, TopNavigation, List, ListItem } from '@ui-kitten/components';
+import { Layout, Text, Button, Card, TopNavigation, ListItem } from '@ui-kitten/components';
 
 const learningTopics = [
   { id: 1, title: 'Budgeting Basics', description: 'Learn how to create and stick to a budget' },
@@ -10,18 +10,6 @@ const learningTopics = [
 ];
 
 export default function LearningHub({ navigation }) {
-  const renderTopicItem = ({ item }) => (
-    <ListItem
-      title={item.title}
-      description={item.description}
-      accessoryRight={() => (
-        <Button size='small' onPress={() => navigation.navigate('QuizDetail', { topic: item })}>
-          Take Quiz
-        </Button>
-      )}
-    />
-  );
-
   return (
     <Layout style={styles.container}>
       <TopNavigation title='Learning Hub' alignment='center' />
@@ -36,10 +24,20 @@ export default function LearningHub({ navigation }) {
         
         <Card style={styles.topicsCard}>
           <Text category='h6' style={styles.cardTitle}>Learning Topics</Text>
-          <List
-            data={learningTopics}
-            renderItem={renderTopicItem}
-          />
+          <View>
+            {learningTopics.map((topic) => (
+              <ListItem
+                key={topic.id}
+                title={topic.title}
+                description={topic.description}
+                accessoryRight={() => (
+                  <Button size='small' onPress={() => navigation.navigate('QuizDetail', { topic })}>
+                    Take Quiz
+                  </Button>
+                )}
+              />
+            ))}
+          </View>
         </Card>
       </ScrollView>
     </Layout>

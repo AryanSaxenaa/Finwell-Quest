@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Layout, Text, List, ListItem, TopNavigation } from '@ui-kitten/components';
+import { Layout, Text, ListItem, TopNavigation } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
 
 const TrophyIcon = (props) => <Ionicons name="trophy" size={20} color="#FFD700" />;
@@ -16,11 +16,12 @@ const leaderboardData = [
 ];
 
 export default function Leaderboard({ navigation }) {
-  const renderLeaderboardItem = ({ item }) => {
+  const renderLeaderboardItem = (item) => {
     const isCurrentUser = item.name === 'You';
     
     return (
       <ListItem
+        key={item.id}
         style={[styles.listItem, isCurrentUser && styles.currentUser]}
         title={`${item.rank}. ${item.name}`}
         description={`${item.score} points`}
@@ -41,10 +42,9 @@ export default function Leaderboard({ navigation }) {
       
       <ScrollView style={styles.content}>
         <Text category='h6' style={styles.title}>Top Players</Text>
-        <List
-          data={leaderboardData}
-          renderItem={renderLeaderboardItem}
-        />
+        <View>
+          {leaderboardData.map(renderLeaderboardItem)}
+        </View>
       </ScrollView>
     </Layout>
   );
