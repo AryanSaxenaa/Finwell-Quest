@@ -3,7 +3,8 @@ import {
   View, 
   StyleSheet, 
   ScrollView, 
-  Dimensions
+  Dimensions,
+  TouchableOpacity
 } from 'react-native';
 import { 
   Layout, 
@@ -15,33 +16,38 @@ import {
 } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
 import { PieChart } from 'react-native-chart-kit';
-import { useExpenseStore, useGameStore } from '../../store';
+import { useExpenseStore, useGameStore, useBudgetStore } from '../../store';
 import AddExpenseModal from '../../components/AddExpenseModal';
-import BudgetCard from '../../components/BudgetCard';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const MenuIcon = (props) => <Ionicons name="menu-outline" size={24} color="#8F9BB3" />;
 const PlusIcon = (props) => <Ionicons name="add-outline" size={24} color="white" />;
 const GameIcon = (props) => <Ionicons name="grid-outline" size={24} color="#8F9BB3" />;
 const ChatIcon = (props) => <Ionicons name="chatbubble-outline" size={24} color="#8F9BB3" />;
+const ChevronIcon = (props) => <Ionicons name="chevron-down" size={16} color="#8F9BB3" />;
+const WarningIcon = (props) => <Ionicons name="warning" size={16} color="#E74C3C" />;
 
 export default function HomeDashboard({ navigation }) {
   const [showAddExpense, setShowAddExpense] = useState(false);
+  const [expandedBudgets, setExpandedBudgets] = useState(false);
   
   const { totalSpent, getExpensesByCategory } = useExpenseStore();
   const { level, xp } = useGameStore();
+  const { getBudgetSummary } = useBudgetStore();
   
   const categoryData = getExpensesByCategory().filter(item => item.total > 0);
+  const budgetSummary = getBudgetSummary();
+  const overBudgetCategories = budgetSummary.filter(b => b.isOverBudget);
 
-  // Prepare chart data
+  // Prepare chart data - smaller size for better half-screen visibility
   const chartColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
   const pieChartData = categoryData.map((item, index) => ({
     name: item.category,
     amount: item.total,
     color: chartColors[index % chartColors.length],
     legendFontColor: '#222B45',
-    legendFontSize: 12,
+    legendFontSize: 10,
   }));
 
   const chartConfig = {
@@ -62,16 +68,152 @@ export default function HomeDashboard({ navigation }) {
     />
   );
 
-  const DailyTipCard = () => (
-    <Card style={styles.tipCard}>
-      <View style={styles.tipHeader}>
-        <Ionicons name="bulb-outline" size={24} color="#FFD700" style={styles.tipIcon} />
-        <Text category='h6'>Daily AI Tip</Text>
+  // Priority Alert Bar - shows budget overages at the top
+  const PriorityAlerts = () => {
+    if (overBudgetCategories.length === 0) return null;
+    
+    return (
+      <Card style={styles.alertCard}>
+        <View style={styles.alertContent}>
+          <WarningIcon />
+          <Text category='s2' style={styles.alertText}>
+            {overBudgetCategories.length} budget{overBudgetCategories.length > 1 ? 's' : ''} over limit
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('BudgetManagement')}>
+            <Text category='s2' style={styles.alertAction}>View</Text>
+          </TouchableOpacity>
+        </View>
+      </Card>
+    );
+  };
+
+  // AI Tip with compact design
+  const CompactTipCard = () => (
+    <Card style={styles.compactTipCard}>
+      <View style={styles.tipContent}>
+        <View style={styles.tipIcon}>
+          <Ionicons name="bulb-outline" size={16} color="#FFD700" />
+        </View>
+        <Text category='s2' style={styles.tipText}>
+          💡 Try setting a daily spending limit to stay on track!
+        </Text>
       </View>
-      <Text category='p2'>
-        Try the 50/30/20 rule: 50% needs, 30% wants, 20% savings. 
-        Your current spending shows room for improvement in the entertainment category.
-      </Text>
+    </Card>
+  );
+
+  // Spending Summary with prominent total
+  const SpendingSummary = () => (
+    <View style={styles.spendingSummary}>
+      <Text category='h3' style={styles.totalAmount}>${totalSpent.toFixed(2)}</Text>
+      <Text category='s1' style={styles.totalLabel}>This Month's Spending</Text>
+      {overBudgetCategories.length > 0 && (
+        <Text category='c2' style={styles.overBudgetNote}>
+          Over budget in {overBudgetCategories.length} categor{overBudgetCategories.length > 1 ? 'ies' : 'y'}
+        </Text>
+      )}
+    </View>
+  );
+
+  // Compact Pie Chart with interactive segments
+  const CompactSpendingChart = () => (
+    <Card style={styles.chartCard}>
+      {pieChartData.length > 0 ? (
+        <View style={styles.chartContainer}>
+          <PieChart
+            data={pieChartData}
+            width={width - 64}
+            height={180}
+            chartConfig={chartConfig}
+            accessor="amount"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            center={[10, 0]}
+            absolute={false}
+          />
+        </View>
+      ) : (
+        <View style={styles.noDataContainer}>
+          <Text category='s1' style={styles.noDataText}>No expenses yet</Text>
+          <Button size='small' onPress={() => setShowAddExpense(true)}>
+            Add First Expense
+          </Button>
+        </View>
+      )}
+    </Card>
+  );
+
+  // Budget Status Bar - compact overview
+  const BudgetStatusBar = () => (
+    <Card style={styles.budgetStatusCard}>
+      <TouchableOpacity 
+        style={styles.budgetHeader}
+        onPress={() => setExpandedBudgets(!expandedBudgets)}
+      >
+        <Text category='h6'>Budget Overview</Text>
+        <View style={styles.budgetHeaderRight}>
+          <Text category='c1' style={styles.budgetCount}>
+            {budgetSummary.length} budget{budgetSummary.length !== 1 ? 's' : ''}
+          </Text>
+          <ChevronIcon style={{ transform: [{ rotate: expandedBudgets ? '180deg' : '0deg' }] }} />
+        </View>
+      </TouchableOpacity>
+      
+      {!expandedBudgets && (
+        <View style={styles.budgetPreview}>
+          {budgetSummary.slice(0, 2).map((budget) => (
+            <View key={budget.id} style={styles.budgetPreviewItem}>
+              <View style={styles.budgetPreviewInfo}>
+                <View style={[styles.budgetDot, { backgroundColor: budget.color }]} />
+                <Text category='s2'>{budget.category}</Text>
+                {budget.isOverBudget && <WarningIcon />}
+              </View>
+              <Text category='s2' style={budget.isOverBudget ? styles.overBudgetText : null}>
+                ${budget.spent}/${budget.limit}
+              </Text>
+            </View>
+          ))}
+          {budgetSummary.length > 2 && (
+            <TouchableOpacity onPress={() => navigation.navigate('BudgetManagement')}>
+              <Text category='c1' style={styles.viewAllText}>View all budgets</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+      
+      {expandedBudgets && (
+        <View style={styles.expandedBudgets}>
+          {budgetSummary.map((budget) => (
+            <View key={budget.id} style={styles.budgetDetailItem}>
+              <View style={styles.budgetDetailHeader}>
+                <View style={styles.budgetDetailInfo}>
+                  <View style={[styles.budgetDot, { backgroundColor: budget.color }]} />
+                  <Text category='s1'>{budget.category}</Text>
+                  {budget.isOverBudget && <WarningIcon />}
+                </View>
+                <Text category='s1' style={budget.isOverBudget ? styles.overBudgetText : null}>
+                  ${budget.spent}/${budget.limit}
+                </Text>
+              </View>
+              <View style={styles.progressContainer}>
+                <View style={styles.progressBar}>
+                  <View 
+                    style={[
+                      styles.progressFill, 
+                      { 
+                        width: `${Math.min(budget.percentage, 100)}%`,
+                        backgroundColor: budget.isOverBudget ? '#E74C3C' : budget.color 
+                      }
+                    ]} 
+                  />
+                </View>
+                <Text category='c2' style={styles.percentageText}>
+                  {budget.percentage}%
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
     </Card>
   );
 
@@ -110,31 +252,29 @@ export default function HomeDashboard({ navigation }) {
   );
 
   const QuickActions = () => (
-    <View style={styles.quickActions}>
-      <Button
-        style={styles.actionButton}
-        accessoryLeft={PlusIcon}
-        onPress={() => setShowAddExpense(true)}
-      >
-        Add Expense
-      </Button>
-      <Button
-        style={styles.actionButton}
-        appearance='outline'
-        accessoryLeft={GameIcon}
-        onPress={() => navigation.navigate('GameTab')}
-      >
-        Start Game
-      </Button>
-      <Button
-        style={styles.actionButton}
-        appearance='outline'
-        accessoryLeft={ChatIcon}
-        onPress={() => navigation.navigate('LearnTab', { screen: 'AIChat' })}
-      >
-        Chat AI
-      </Button>
-    </View>
+    <Card style={styles.card}>
+      <Text category='h6' style={styles.cardTitle}>Quick Actions</Text>
+      <View style={styles.quickActionsRow}>
+        <Button
+          style={styles.compactActionButton}
+          appearance='outline'
+          accessoryLeft={GameIcon}
+          onPress={() => navigation.navigate('GameTab')}
+          size='small'
+        >
+          Play Game
+        </Button>
+        <Button
+          style={styles.compactActionButton}
+          appearance='outline'
+          accessoryLeft={ChatIcon}
+          onPress={() => navigation.navigate('LearnTab', { screen: 'AIChat' })}
+          size='small'
+        >
+          AI Chat
+        </Button>
+      </View>
+    </Card>
   );
 
   const GameStats = () => (
@@ -166,9 +306,16 @@ export default function HomeDashboard({ navigation }) {
       />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <DailyTipCard />
-        <BudgetCard navigation={navigation} />
-        <SpendingOverview />
+        {/* Priority alerts at the very top */}
+        <PriorityAlerts />
+        
+        {/* Essential info in top half of screen */}
+        <CompactTipCard />
+        <SpendingSummary />
+        <CompactSpendingChart />
+        <BudgetStatusBar />
+        
+        {/* Secondary content below the fold */}
         <GameStats />
         <QuickActions />
         
@@ -180,6 +327,15 @@ export default function HomeDashboard({ navigation }) {
           View Expense History
         </Button>
       </ScrollView>
+
+      {/* Floating Action Button */}
+      <TouchableOpacity 
+        style={styles.fab}
+        onPress={() => setShowAddExpense(true)}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="add" size={24} color="white" />
+      </TouchableOpacity>
 
       <AddExpenseModal 
         visible={showAddExpense}
@@ -222,13 +378,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   totalAmount: {
-    color: '#6C5CE7',
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 16,
+    color: '#6C5CE7',
+    marginBottom: 4,
   },
   chartContainer: {
     alignItems: 'center',
-    padding: 16,
+    padding: 8,
   },
   categoryList: {
     width: '100%',
@@ -268,6 +425,14 @@ const styles = StyleSheet.create({
   quickActions: {
     marginBottom: 16,
   },
+  quickActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  compactActionButton: {
+    flex: 1,
+  },
   actionButton: {
     marginBottom: 12,
   },
@@ -280,5 +445,184 @@ const styles = StyleSheet.create({
   },
   historyButton: {
     marginBottom: 20,
+  },
+  
+  // Priority Alert Styles
+  alertCard: {
+    marginBottom: 8,
+    backgroundColor: '#FFF5F5',
+    borderLeftWidth: 4,
+    borderLeftColor: '#E74C3C',
+  },
+  alertContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  alertText: {
+    flex: 1,
+    marginLeft: 8,
+    color: '#E74C3C',
+    fontWeight: '600',
+  },
+  alertAction: {
+    color: '#E74C3C',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+  },
+  
+  // Compact Tip Card Styles
+  compactTipCard: {
+    marginBottom: 12,
+    backgroundColor: '#FFF9E6',
+    borderLeftWidth: 3,
+    borderLeftColor: '#FFD700',
+  },
+  tipContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#8F5F00',
+  },
+  
+  // Spending Summary Styles
+  spendingSummary: {
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingVertical: 12,
+  },
+  totalLabel: {
+    fontSize: 16,
+    color: '#8F9BB3',
+    marginBottom: 4,
+  },
+  overBudgetNote: {
+    color: '#E74C3C',
+    fontSize: 12,
+    fontStyle: 'italic',
+  },
+  
+  // Budget Status Bar Styles
+  budgetStatusCard: {
+    marginBottom: 16,
+  },
+  budgetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  budgetHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  budgetCount: {
+    marginRight: 8,
+    color: '#8F9BB3',
+  },
+  budgetPreview: {
+    marginTop: 12,
+  },
+  budgetPreviewItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  budgetPreviewInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  budgetDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  overBudgetText: {
+    color: '#E74C3C',
+    fontWeight: '600',
+  },
+  viewAllText: {
+    color: '#6C5CE7',
+    textAlign: 'center',
+    marginTop: 8,
+    textDecorationLine: 'underline',
+  },
+  expandedBudgets: {
+    marginTop: 12,
+  },
+  budgetDetailItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E9F2',
+  },
+  budgetDetailHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  budgetDetailInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  progressBar: {
+    flex: 1,
+    height: 6,
+    backgroundColor: '#E4E9F2',
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginRight: 8,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  percentageText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#8F9BB3',
+    width: 30,
+  },
+  
+  // Floating Action Button
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#6C5CE7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+  },
+  
+  // Chart styles
+  noDataContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  noDataText: {
+    color: '#8F9BB3',
+    marginBottom: 12,
   },
 });
