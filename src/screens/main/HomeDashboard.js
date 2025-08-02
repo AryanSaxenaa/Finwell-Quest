@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { PieChart } from 'react-native-chart-kit';
 import { useExpenseStore, useGameStore } from '../../store';
 import AddExpenseModal from '../../components/AddExpenseModal';
+import BudgetCard from '../../components/BudgetCard';
 
 const { width } = Dimensions.get('window');
 
@@ -166,6 +167,7 @@ export default function HomeDashboard({ navigation }) {
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <DailyTipCard />
+        <BudgetCard navigation={navigation} />
         <SpendingOverview />
         <GameStats />
         <QuickActions />

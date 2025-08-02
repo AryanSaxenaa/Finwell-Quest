@@ -56,11 +56,16 @@ export const useGameStore = create((set, get) => ({
 export const useExpenseStore = create((set) => ({
   expenses: [],
   totalSpent: 0,
-  categories: ['Food', 'Transport', 'Entertainment', 'Shopping', 'Bills', 'Other'],
+  categories: ['Housing', 'Transport', 'Food', 'Entertainment', 'Shopping', 'Bills', 'Other'],
   
   addExpense: (expense) => set((state) => {
     const newExpenses = [...state.expenses, expense];
     const newTotal = newExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    
+    // Update budget spending
+    const { updateBudgetSpending } = useBudgetStore.getState();
+    updateBudgetSpending(expense.category, expense.amount);
+    
     return { 
       expenses: newExpenses, 
       totalSpent: newTotal 
@@ -83,6 +88,91 @@ export const useExpenseStore = create((set) => ({
       total: expenses
         .filter(exp => exp.category === category)
         .reduce((sum, exp) => sum + exp.amount, 0)
+    }));
+  },
+}));
+
+// Budget store
+export const useBudgetStore = create((set, get) => ({
+  budgets: [
+    { 
+      id: 1, 
+      category: 'Housing', 
+      limit: 1000, 
+      spent: 800, 
+      color: '#8B4513' 
+    },
+    { 
+      id: 2, 
+      category: 'Transport', 
+      limit: 200, 
+      spent: 45, 
+      color: '#36A2EB' 
+    },
+    { 
+      id: 3, 
+      category: 'Food', 
+      limit: 400, 
+      spent: 195, 
+      color: '#FF9F40' 
+    },
+    { 
+      id: 4, 
+      category: 'Entertainment', 
+      limit: 150, 
+      spent: 80, 
+      color: '#9966FF' 
+    },
+  ],
+
+  getBudgetByCategory: (category) => {
+    const { budgets } = get();
+    return budgets.find(budget => budget.category === category);
+  },
+
+  updateBudgetSpent: (category, amount) => set((state) => ({
+    budgets: state.budgets.map(budget => 
+      budget.category === category 
+        ? { ...budget, spent: budget.spent + amount }
+        : budget
+    )
+  })),
+
+  setBudgetLimit: (category, limit) => set((state) => ({
+    budgets: state.budgets.map(budget => 
+      budget.category === category 
+        ? { ...budget, limit }
+        : budget
+    )
+  })),
+
+  updateBudgetSpending: (category, amount) => set((state) => ({
+    budgets: state.budgets.map(budget => 
+      budget.category === category 
+        ? { ...budget, spent: budget.spent + amount }
+        : budget
+    )
+  })),
+
+  resetMonthlyBudgets: () => set((state) => ({
+    budgets: state.budgets.map(budget => ({ ...budget, spent: 0 }))
+  })),
+
+  addBudget: (budget) => set((state) => ({
+    budgets: [...state.budgets, { ...budget, id: Date.now() }]
+  })),
+
+  removeBudget: (id) => set((state) => ({
+    budgets: state.budgets.filter(budget => budget.id !== id)
+  })),
+
+  getBudgetSummary: () => {
+    const { budgets } = get();
+    return budgets.map(budget => ({
+      ...budget,
+      remaining: budget.limit - budget.spent,
+      percentage: Math.round((budget.spent / budget.limit) * 100),
+      isOverBudget: budget.spent > budget.limit
     }));
   },
 }));
