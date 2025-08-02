@@ -1,33 +1,30 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Modal as RNModal } from 'react-native';
-import { 
-  Layout, 
-  Text, 
-  Input, 
-  Button, 
-  Select,
-  SelectItem,
-  Card
-} from '@ui-kitten/components';
-import { Ionicons } from '@expo/vector-icons';
-import { useExpenseStore } from '../store';
-
-const CalendarIcon = (props) => <Ionicons name="calendar-outline" size={24} color="#8F9BB3" />;
-const CloseIcon = (props) => <Ionicons name="close-outline" size={24} color="#8F9BB3" />;
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import Modal from 'react-native-modal';
+import { Layout, Text, Button, Select, SelectItem, Input } from '@ui-kitten/components';
+import { useExpenseStore } from '../store/index.js';
 
 export default function AddExpenseModal({ visible, onClose }) {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [date, setDate] = useState(new Date().toLocaleDateString());
-  
   const { categories, addExpense } = useExpenseStore();
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (visible) {
+      setAmount('');
+      setDescription('');
+      setSelectedCategory(null);
+      setDate(new Date().toLocaleDateString());
+    }
+  }, [visible]);
 
   const handleSave = () => {
     if (!amount || !selectedCategory) {
       return;
     }
-
     const expense = {
       id: Date.now().toString(),
       amount: parseFloat(amount),
@@ -35,72 +32,73 @@ export default function AddExpenseModal({ visible, onClose }) {
       description,
       date: new Date().toISOString(),
     };
-
     addExpense(expense);
-    
-    // Reset form
-    setAmount('');
-    setDescription('');
-    setSelectedCategory(null);
-    setDate(new Date().toLocaleDateString());
-    
     onClose();
   };
 
   return (
-    <RNModal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
+    <Modal
+      isVisible={visible}
+      onBackdropPress={onClose}
+      onBackButtonPress={onClose}
+      style={{ margin: 0, justifyContent: 'center' }}
     >
-      <View style={styles.overlay}>
-        <Card style={styles.modal}>
+      <Layout style={styles.container}>
           <View style={styles.header}>
             <Text category='h5'>Add Expense</Text>
             <Button
               appearance='ghost'
-              accessoryLeft={CloseIcon}
               onPress={onClose}
               style={styles.closeButton}
-            />
+            >
+              ✕
+            </Button>
           </View>
 
-          <Input
-            style={styles.input}
-            placeholder='Amount'
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType='numeric'
-            accessoryLeft={<Text>$</Text>}
-          />
+          <View style={styles.form}>
+            <Input
+              style={styles.input}
+              placeholder='0.00'
+              label='Amount ($)'
+              value={amount}
+              onChangeText={(text) => {
+                console.log('Amount changed:', text);
+                setAmount(text);
+              }}
+              keyboardType='decimal-pad'
+              returnKeyType="next"
+              autoFocus
+            />
 
-          <Select
-            style={styles.input}
-            placeholder='Select Category'
-            value={selectedCategory ? categories[selectedCategory.row] : ''}
-            selectedIndex={selectedCategory}
-            onSelect={setSelectedCategory}
-          >
-            {categories.map((category, index) => (
-              <SelectItem key={index} title={category} />
-            ))}
-          </Select>
+            <Select
+              style={styles.input}
+              placeholder='Select Category'
+              label='Category'
+              value={selectedCategory ? categories[selectedCategory.row] : null}
+              selectedIndex={selectedCategory}
+              onSelect={(index) => setSelectedCategory(index)}
+            >
+              {categories.map((category, index) => (
+                <SelectItem key={index} title={category} />
+              ))}
+            </Select>
 
-          <Input
-            style={styles.input}
-            placeholder='Description (optional)'
-            value={description}
-            onChangeText={setDescription}
-            multiline
-          />
+            <Input
+              style={styles.input}
+              placeholder='Description (optional)'
+              value={description}
+              onChangeText={setDescription}
+              multiline={true}
+              numberOfLines={3}
+            />
 
-          <Input
-            style={styles.input}
-            placeholder='Date'
-            value={date}
-            accessoryLeft={CalendarIcon}
-            disabled
-          />
+            <Input
+              style={styles.input}
+              placeholder='Date'
+              value={date}
+              disabled
+            />
+          </View>
 
           <View style={styles.buttonContainer}>
             <Button
@@ -118,32 +116,33 @@ export default function AddExpenseModal({ visible, onClose }) {
               Save
             </Button>
           </View>
-        </Card>
-      </View>
-    </RNModal>
+        </Layout>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
+  container: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modal: {
-    width: '90%',
-    maxWidth: 400,
-    padding: 20,
+    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E9F2',
   },
   closeButton: {
     paddingHorizontal: 0,
+  },
+  form: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   input: {
     marginBottom: 16,
@@ -151,7 +150,9 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    paddingTop: 20,
   },
   button: {
     flex: 1,

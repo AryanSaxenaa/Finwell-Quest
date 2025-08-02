@@ -3,8 +3,7 @@ import {
   View, 
   StyleSheet, 
   ScrollView, 
-  Dimensions,
-  Modal 
+  Dimensions
 } from 'react-native';
 import { 
   Layout, 
@@ -146,16 +145,10 @@ export default function HomeDashboard({ navigation }) {
         </Button>
       </ScrollView>
 
-      <Modal
+      <AddExpenseModal 
         visible={showAddExpense}
-        animationType="slide"
-        transparent={true}
-      >
-        <AddExpenseModal 
-          visible={showAddExpense}
-          onClose={() => setShowAddExpense(false)}
-        />
-      </Modal>
+        onClose={() => setShowAddExpense(false)}
+      />
     </Layout>
   );
 }
