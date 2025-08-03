@@ -199,24 +199,31 @@ export default function GameBoard({ navigation }) {
         />
         <View style={styles.gameOverContainer}>
           <Card style={styles.gameOverCard}>
+            <Ionicons name="skull-outline" size={64} color="#E74C3C" style={styles.gameOverIcon} />
             <Text category='h4' style={styles.gameOverText}>Game Over!</Text>
-            <Text category='p1'>Your final score: {score}</Text>
+            <Text category='p1' style={styles.gameOverScore}>Your final score: {score}</Text>
+            
             <View style={styles.gameOverButtons}>
               <Button
                 style={styles.restartButton}
+                size='large'
                 onPress={() => {
                   resetGame();
                   navigation.replace('GameBoard');
                 }}
+                accessoryLeft={() => <Ionicons name="refresh" size={20} color="white" />}
               >
-                🔄 Restart Game
+                Restart Game
               </Button>
+              
               <Button
                 style={styles.resultsButton}
+                size='large'
                 appearance='outline'
                 onPress={() => navigation.navigate('GameResults')}
+                accessoryLeft={() => <Ionicons name="stats-chart" size={20} color="#6C5CE7" />}
               >
-                📊 View Results
+                View Results
               </Button>
             </View>
           </Card>
@@ -474,25 +481,39 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   gameOverCard: {
-    padding: 24,
+    padding: 32,
     alignItems: 'center',
+    width: '100%',
+    maxWidth: 350,
+  },
+  gameOverIcon: {
+    marginBottom: 16,
   },
   gameOverText: {
-    marginBottom: 16,
+    marginBottom: 12,
     color: '#E74C3C',
     textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  gameOverScore: {
+    marginBottom: 24,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#8F9BB3',
   },
   gameOverButtons: {
-    flexDirection: 'row',
-    marginTop: 20,
-    gap: 12,
+    width: '100%',
+    gap: 16,
   },
   restartButton: {
-    flex: 1,
-    marginRight: 6,
+    backgroundColor: '#6C5CE7',
+    borderRadius: 12,
+    marginBottom: 12,
+    minHeight: 50,
   },
   resultsButton: {
-    flex: 1,
-    marginLeft: 6,
+    borderColor: '#6C5CE7',
+    borderRadius: 12,
+    minHeight: 50,
   },
 });

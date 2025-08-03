@@ -1,10 +1,18 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Layout, Text, Button, Card, TopNavigation } from '@ui-kitten/components';
+import { 
+  Layout, 
+  Text, 
+  Button, 
+  Card, 
+  TopNavigation,
+  TopNavigationAction 
+} from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 
 const TrophyIcon = (props) => <Ionicons name="trophy" size={64} color="#FFD700" />;
+const BackIcon = (props) => <Ionicons name="arrow-back" size={24} color="#8F9BB3" />;
 
 export default function GameResults({ navigation }) {
   const { score, gameStats, resetGame, updateGameStats, level, xp } = useGameStore();
@@ -34,6 +42,16 @@ export default function GameResults({ navigation }) {
     });
   };
 
+  const renderBackAction = () => (
+    <TopNavigationAction 
+      icon={BackIcon} 
+      onPress={() => {
+        resetGame();
+        navigation.goBack();
+      }} 
+    />
+  );
+
   // Calculate performance percentage
   const performancePercentage = Math.min(100, (score / 100) * 100);
   
@@ -57,7 +75,11 @@ export default function GameResults({ navigation }) {
 
   return (
     <Layout style={styles.container}>
-      <TopNavigation title='Game Results' alignment='center' />
+      <TopNavigation 
+        title='Game Results' 
+        alignment='center'
+        accessoryLeft={renderBackAction}
+      />
       
       <View style={styles.content}>
         {/* Performance Card */}
