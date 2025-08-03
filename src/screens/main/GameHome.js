@@ -106,7 +106,7 @@ export default function GameHome({ navigation }) {
         <Button
           style={styles.compactLeaderboardButton}
           appearance='ghost'
-          onPress={() => navigation.navigate('SocialTab', { screen: 'Leaderboard' })}
+          onPress={() => navigation.navigate('Leaderboard')}
           accessoryLeft={() => <Ionicons name="podium" size={20} color="#6C5CE7" />}
         >
           Leaderboard

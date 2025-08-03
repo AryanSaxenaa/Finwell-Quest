@@ -5,6 +5,7 @@ import GameBoard from '../screens/main/GameBoard';
 import QuestionScreen from '../screens/main/QuestionScreen';
 import GameResults from '../screens/main/GameResults';
 import DailyChallenge from '../screens/main/DailyChallenge';
+import Leaderboard from '../screens/main/Leaderboard';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ export default function GameStackNavigator() {
       <Stack.Screen name="QuestionScreen" component={QuestionScreen} />
       <Stack.Screen name="GameResults" component={GameResults} />
       <Stack.Screen name="DailyChallenge" component={DailyChallenge} />
+      <Stack.Screen name="Leaderboard" component={Leaderboard} />
     </Stack.Navigator>
   );
 }

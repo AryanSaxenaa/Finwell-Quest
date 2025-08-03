@@ -15,13 +15,6 @@ export default function LearningHub({ navigation }) {
       <TopNavigation title='Learning Hub' alignment='center' />
       
       <ScrollView style={styles.content}>
-        <Button
-          style={styles.chatButton}
-          onPress={() => navigation.navigate('AIChat')}
-        >
-          Chat with AI Assistant
-        </Button>
-        
         <Card style={styles.topicsCard}>
           <Text category='h6' style={styles.cardTitle}>Learning Topics</Text>
           <View>
@@ -52,9 +45,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 16,
-  },
-  chatButton: {
-    marginBottom: 16,
   },
   topicsCard: {
     marginBottom: 16,
