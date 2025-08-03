@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Dimensions, Text as RNText } from 'react-native';
 import { 
   Layout, 
   Text, 
@@ -70,14 +70,18 @@ export default function AIChat({ navigation }) {
       styles.message,
       msg.sender === 'user' ? styles.userMessage : styles.aiMessage
     ]}>
-      <Text style={msg.sender === 'user' ? styles.userText : styles.aiText}>
+      <RNText style={msg.sender === 'user' ? styles.userText : styles.aiText}>
         {msg.text}
-      </Text>
+      </RNText>
     </View>
   );
 
   return (
-    <Layout style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
       <TopNavigation title='AI Assistant' alignment='center' />
       
       <View style={styles.content}>
@@ -101,7 +105,12 @@ export default function AIChat({ navigation }) {
           </ButtonGroup>
         </Card>
 
-        <ScrollView style={styles.chatContainer}>
+        <ScrollView 
+          style={styles.chatContainer}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.chatContent}
+        >
           {chatHistory.length === 0 ? (
             <Text style={styles.emptyChat}>
               Start a conversation with your AI financial assistant!
@@ -117,7 +126,8 @@ export default function AIChat({ navigation }) {
             placeholder="Ask about your finances..."
             value={message}
             onChangeText={setMessage}
-            multiline
+            onSubmitEditing={handleSend}
+            returnKeyType="send"
           />
           <Button
             style={styles.sendButton}
@@ -127,7 +137,7 @@ export default function AIChat({ navigation }) {
           />
         </View>
       </View>
-    </Layout>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -138,7 +148,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
   },
   modeCard: {
     marginBottom: 16,
@@ -158,10 +170,14 @@ const styles = StyleSheet.create({
   },
   chatContainer: {
     flex: 1,
-    marginBottom: 16,
+  chatContainer: {
+    flex: 1,
+    marginBottom: 8,
   },
-  emptyChat: {
-    textAlign: 'center',
+  chatContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },textAlign: 'center',
     fontStyle: 'italic',
     opacity: 0.6,
     padding: 20,
@@ -178,21 +194,35 @@ const styles = StyleSheet.create({
   },
   aiMessage: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E5E5E5',
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
   },
   userText: {
-    color: 'white',
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
   },
   aiText: {
-    color: '#333',
+    color: '#000000',
+    fontWeight: '700',
+    fontSize: 16,
+    lineHeight: 22,
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    minHeight: 60,
   },
   input: {
     flex: 1,
     marginRight: 8,
+    backgroundColor: '#F8F9FA',
   },
   sendButton: {
     paddingHorizontal: 16,
