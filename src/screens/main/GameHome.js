@@ -18,7 +18,25 @@ const FlashIcon = (props) => <Ionicons name="flash-outline" size={32} color="#00
 const HeartIcon = (props) => <Ionicons name="heart-outline" size={32} color="#E74C3C" />;
 
 export default function GameHome({ navigation }) {
-  const { score, level, xp, lives, gameStats } = useGameStore();
+  const { 
+    score, 
+    level, 
+    xp, 
+    lives, 
+    gameStats, 
+    getXPForNextLevel, 
+    getXPProgress,
+    resetGame
+  } = useGameStore();
+
+  const handleStartGame = () => {
+    resetGame(); // Reset game state before starting
+    navigation.navigate('GameBoard');
+  };
+
+  const xpForNext = getXPForNextLevel(xp);
+  const xpProgress = getXPProgress(xp);
+  const progressPercentage = (xpProgress / 100) * 100;
 
   const StatCard = ({ title, value, icon }) => (
     <Card style={styles.statCard}>
@@ -64,7 +82,7 @@ export default function GameHome({ navigation }) {
             style={styles.playButton}
             size='large'
             accessoryLeft={PlayIcon}
-            onPress={() => navigation.navigate('GameBoard')}
+            onPress={handleStartGame}
           >
             Play Dice Game
           </Button>
@@ -82,6 +100,20 @@ export default function GameHome({ navigation }) {
             icon={<TrophyIcon />}
           />
         </View>
+
+        {/* XP Progress Card */}
+        <Card style={styles.xpCard}>
+          <View style={styles.xpHeader}>
+            <Text category='h6'>Level {level} Progress</Text>
+            <Text category='c1'>{xpProgress}/100 XP</Text>
+          </View>
+          <View style={styles.xpProgressBar}>
+            <View style={[styles.xpProgressFill, { width: `${progressPercentage}%` }]} />
+          </View>
+          <Text category='c1' style={styles.xpText}>
+            {100 - xpProgress} XP until Level {level + 1}
+          </Text>
+        </Card>
 
         <View style={styles.statsContainer}>
           <StatCard 
@@ -106,12 +138,16 @@ export default function GameHome({ navigation }) {
               <Text category='h6'>{gameStats.totalGamesPlayed}</Text>
             </View>
             <View style={styles.achievementItem}>
-              <Text category='s1'>Total Score</Text>
-              <Text category='h6'>{gameStats.totalScore}</Text>
+              <Text category='s1'>Accuracy</Text>
+              <Text category='h6'>
+                {gameStats.totalQuestionsAnswered > 0 
+                  ? Math.round((gameStats.totalCorrectAnswers / gameStats.totalQuestionsAnswered) * 100)
+                  : 0}%
+              </Text>
             </View>
             <View style={styles.achievementItem}>
-              <Text category='s1'>Best Score</Text>
-              <Text category='h6'>{gameStats.bestScore}</Text>
+              <Text category='s1'>Best Streak</Text>
+              <Text category='h6'>{gameStats.streaks?.longestStreak || 0}</Text>
             </View>
           </View>
         </Card>
@@ -178,6 +214,35 @@ const styles = StyleSheet.create({
   },
   statText: {
     flex: 1,
+  },
+  xpCard: {
+    marginBottom: 16,
+    backgroundColor: '#F0F8FF',
+    borderLeftWidth: 4,
+    borderLeftColor: '#6C5CE7',
+  },
+  xpHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  xpProgressBar: {
+    height: 8,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginBottom: 8,
+    overflow: 'hidden',
+  },
+  xpProgressFill: {
+    height: '100%',
+    backgroundColor: '#6C5CE7',
+    borderRadius: 4,
+  },
+  xpText: {
+    textAlign: 'center',
+    color: '#6C5CE7',
+    fontWeight: '500',
   },
   challengeCard: {
     marginBottom: 16,

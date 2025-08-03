@@ -16,24 +16,121 @@ export const useGameStore = create((set, get) => ({
   lives: 3,
   position: 0,
   currentQuestion: null,
+  lastLevelUp: false,
   gameStats: {
     totalGamesPlayed: 0,
     totalScore: 0,
     bestScore: 0,
+    totalQuestionsAnswered: 0,
+    totalCorrectAnswers: 0,
+    categoryStats: {
+      budgeting: { answered: 0, correct: 0 },
+      saving: { answered: 0, correct: 0 },
+      investing: { answered: 0, correct: 0 },
+      debt: { answered: 0, correct: 0 },
+      insurance: { answered: 0, correct: 0 },
+      credit: { answered: 0, correct: 0 },
+    },
+    streaks: {
+      currentStreak: 0,
+      longestStreak: 0,
+    },
+    badges: [],
   },
   
-  updateScore: (points) => set((state) => ({ 
-    score: state.score + points,
-    xp: state.xp + points 
-  })),
+  // Level progression: Every 100 XP = 1 level
+  calculateLevel: (xp) => Math.floor(xp / 100) + 1,
+  getXPForNextLevel: (currentXP) => (Math.floor(currentXP / 100) + 1) * 100,
+  getXPProgress: (currentXP) => currentXP % 100,
+  
+  updateScore: (points, category = null, isCorrect = true) => set((state) => {
+    const newXP = state.xp + points;
+    const newLevel = Math.floor(newXP / 100) + 1;
+    const leveledUp = newLevel > state.level;
+    
+    // Update category stats
+    const newCategoryStats = { ...state.gameStats.categoryStats };
+    if (category && newCategoryStats[category]) {
+      newCategoryStats[category].answered += 1;
+      if (isCorrect) {
+        newCategoryStats[category].correct += 1;
+      }
+    }
+    
+    // Update streaks
+    const newStreaks = { ...state.gameStats.streaks };
+    if (isCorrect) {
+      newStreaks.currentStreak += 1;
+      newStreaks.longestStreak = Math.max(newStreaks.longestStreak, newStreaks.currentStreak);
+    } else {
+      newStreaks.currentStreak = 0;
+    }
+    
+    return {
+      score: state.score + points,
+      xp: newXP,
+      level: newLevel,
+      lastLevelUp: leveledUp,
+      gameStats: {
+        ...state.gameStats,
+        totalQuestionsAnswered: state.gameStats.totalQuestionsAnswered + 1,
+        totalCorrectAnswers: state.gameStats.totalCorrectAnswers + (isCorrect ? 1 : 0),
+        categoryStats: newCategoryStats,
+        streaks: newStreaks,
+      }
+    };
+  }),
   
   loseLife: () => set((state) => ({ lives: Math.max(0, state.lives - 1) })),
+  
+  clearLevelUp: () => set({ lastLevelUp: false }),
+  
+  levelUp: () => set((state) => ({ lastLevelUp: true })),
+  
+  checkLevelUp: () => {
+    const state = get();
+    const newLevel = Math.floor(state.xp / 100) + 1;
+    return newLevel > state.level;
+  },
   
   resetGame: () => set({ 
     score: 0, 
     lives: 3, 
     position: 0, 
-    currentQuestion: null 
+    currentQuestion: null,
+    lastLevelUp: false,
+    // Don't reset XP and level - keep player progression
+    // Only reset the current game state
+  }),
+  
+  // Add a complete reset function for new players
+  resetAllProgress: () => set({
+    score: 0,
+    level: 1,
+    xp: 0,
+    lives: 3,
+    position: 0,
+    currentQuestion: null,
+    lastLevelUp: false,
+    gameStats: {
+      totalGamesPlayed: 0,
+      totalScore: 0,
+      bestScore: 0,
+      totalQuestionsAnswered: 0,
+      totalCorrectAnswers: 0,
+      categoryStats: {
+        budgeting: { answered: 0, correct: 0 },
+        saving: { answered: 0, correct: 0 },
+        investing: { answered: 0, correct: 0 },
+        debt: { answered: 0, correct: 0 },
+        insurance: { answered: 0, correct: 0 },
+        credit: { answered: 0, correct: 0 },
+      },
+      streaks: {
+        currentStreak: 0,
+        longestStreak: 0,
+      },
+    },
   }),
   
   movePlayer: (steps) => set((state) => ({ 

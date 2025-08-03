@@ -38,10 +38,10 @@ export default function HomeDashboard({ navigation }) {
   ];
 
   const sampleBudgetData = [
-    { name: 'Housing', spent: 1053, limit: 1000, color: '#FF4757' },
-    { name: 'Transport', spent: 70, limit: 200, color: '#FFA726' },
-    { name: 'Food', spent: 195, limit: 400, color: '#FFA726' },
-    { name: 'Entertainment', spent: 80, limit: 150, color: '#FFA726' },
+    { name: 'Groceries', spent: 250, limit: 300 },
+    { name: 'Transport', spent: 120, limit: 150 },
+    { name: 'Entertainment', spent: 80, limit: 100 },
+    { name: 'Utilities', spent: 100, limit: 100 },
   ];
 
   const displayData = categoryData.length > 0 ? categoryData.map((item, index) => ({
@@ -140,45 +140,38 @@ export default function HomeDashboard({ navigation }) {
             <Ionicons name="add" size={16} color="white" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Add Expense</Text>
           </Button>
+
+          <Button
+            style={styles.viewAllExpensesButton}
+            onPress={() => navigation.navigate('ExpenseHistory')}
+          >
+            <Ionicons name="list" size={16} color="#6366F1" style={styles.buttonIcon} />
+            <Text style={styles.viewAllExpensesButtonText}>View All Expenses</Text>
+          </Button>
         </View>
 
         {/* Budget Overview Section */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Budget Overview</Text>
-            <TouchableOpacity style={styles.dropdown}>
-              <Text style={styles.dropdownText}>This Month</Text>
-              <Ionicons name="chevron-down" size={16} color="#9CA3AF" />
-            </TouchableOpacity>
+            <Text style={styles.dropdownText}>This Month</Text>
           </View>
 
           {/* Budget Items */}
-          <View style={styles.budgetList}>
+          <View style={styles.budgetCardsContainer}>
             {sampleBudgetData.map((budget, index) => {
               const percentage = (budget.spent / budget.limit) * 100;
               const isOverBudget = percentage > 100;
               return (
-                <View key={index} style={styles.budgetItem}>
-                  <View style={styles.budgetHeader}>
-                    <Text style={styles.budgetCategory}>{budget.name}</Text>
-                    <TouchableOpacity>
-                      <Ionicons name="chevron-down" size={16} color="#9CA3AF" />
-                    </TouchableOpacity>
-                  </View>
-                  <Text style={styles.budgetAmount}>
-                    ${budget.spent} / ${budget.limit}
-                  </Text>
-                  <View style={styles.progressBarContainer}>
-                    <View style={styles.progressBar}>
-                      <View 
-                        style={[
-                          styles.progressFill, 
-                          { 
-                            width: `${Math.min(percentage, 100)}%`,
-                            backgroundColor: isOverBudget ? '#FF4757' : '#FFA726'
-                          }
-                        ]} 
-                      />
+                <View key={index} style={styles.budgetCard}>
+                  <View style={styles.budgetCardContent}>
+                    <View style={styles.budgetCardLeft}>
+                      <Text style={styles.budgetCardCategory}>{budget.name}</Text>
+                    </View>
+                    <View style={styles.budgetCardRight}>
+                      <Text style={styles.budgetCardAmount}>
+                        ${budget.spent} / ${budget.limit}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -188,11 +181,10 @@ export default function HomeDashboard({ navigation }) {
 
           <Button
             style={styles.addBudgetButton}
-            appearance="outline"
             onPress={() => navigation.navigate('BudgetManagement')}
           >
-            <Ionicons name="add" size={16} color="#6366F1" style={styles.buttonIcon} />
-            <Text style={styles.outlineButtonText}>Add Budget</Text>
+            <Ionicons name="add" size={16} color="white" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Add Budget</Text>
           </Button>
         </View>
       </ScrollView>
@@ -253,8 +245,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: '700',
     color: '#000000',
   },
   card: {
@@ -282,14 +274,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000000',
   },
-  dropdown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   dropdownText: {
     fontSize: 14,
     color: '#9CA3AF',
-    marginRight: 4,
   },
   chartContainer: {
     alignItems: 'center',
@@ -364,15 +351,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 0,
   },
-  addBudgetButton: {
-    borderColor: '#6366F1',
-    borderRadius: 12,
-    paddingVertical: 16,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
   buttonIcon: {
     marginRight: 8,
   },
@@ -381,7 +359,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  outlineButtonText: {
+  viewAllExpensesButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#6366F1',
+    marginTop: 12,
+  },
+  viewAllExpensesButtonText: {
     color: '#6366F1',
     fontSize: 16,
     fontWeight: '600',
@@ -390,35 +379,62 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   budgetItem: {
-    marginBottom: 20,
+    paddingVertical: 16,
   },
-  budgetHeader: {
+  budgetCardsContainer: {
+    marginBottom: 24,
+  },
+  budgetCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  budgetCardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
   },
-  budgetCategory: {
-    fontSize: 16,
-    fontWeight: '500',
+  budgetCardLeft: {
+    flex: 1,
+  },
+  budgetCardCategory: {
+    fontSize: 18,
+    fontWeight: '600',
     color: '#000000',
   },
-  budgetAmount: {
-    fontSize: 14,
+  budgetCardRight: {
+    alignItems: 'center',
+  },
+  budgetCardAmount: {
+    fontSize: 16,
+    fontWeight: '500',
     color: '#6B7280',
-    marginBottom: 12,
   },
-  progressBarContainer: {
-    marginBottom: 4,
-  },
-  progressBar: {
-    height: 8,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
+  addBudgetButton: {
+    backgroundColor: '#6366F1',
+    borderRadius: 12,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
   },
 });

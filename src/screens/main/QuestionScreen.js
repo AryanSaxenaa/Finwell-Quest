@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Animated } from 'react-native';
 import { 
   Layout, 
   Text, 
@@ -21,8 +21,14 @@ export default function QuestionScreen({ navigation, route }) {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [question, setQuestion] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   
-  const { updateScore, loseLife } = useGameStore();
+  // Animation values
+  const scaleValue = new Animated.Value(1);
+  const fadeValue = new Animated.Value(1);
+  const slideValue = new Animated.Value(0);
+  
+  const { updateScore, loseLife, levelUp, checkLevelUp } = useGameStore();
 
   useEffect(() => {
     // Get a random question when component mounts
@@ -33,7 +39,10 @@ export default function QuestionScreen({ navigation, route }) {
   const renderBackAction = () => (
     <TopNavigationAction 
       icon={BackIcon} 
-      onPress={() => navigation.goBack()} 
+      onPress={() => {
+        // Always allow back navigation from question screen
+        navigation.goBack();
+      }} 
     />
   );
 
@@ -42,10 +51,44 @@ export default function QuestionScreen({ navigation, route }) {
     
     const correct = selectedIndex === question.correctAnswer;
     setIsCorrect(correct);
+    
+    // Start answer animation
+    Animated.sequence([
+      Animated.timing(scaleValue, {
+        toValue: 0.95,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleValue, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    
+    // Slide in result
+    Animated.timing(slideValue, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    
     setShowResult(true);
     
     if (correct) {
       updateScore(question.points);
+      
+      // Check for level up
+      const leveledUp = checkLevelUp();
+      if (leveledUp) {
+        levelUp();
+      }
+      
+      // Show confetti for hard questions
+      if (question.difficulty === 'hard') {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 3000);
+      }
     } else {
       loseLife();
     }
@@ -68,24 +111,73 @@ export default function QuestionScreen({ navigation, route }) {
           accessoryLeft={renderBackAction}
         />
         <View style={styles.resultContainer}>
-          <Card style={[styles.resultCard, { backgroundColor: isCorrect ? '#E8F5E8' : '#FDE8E8' }]}>
-            <Ionicons 
-              name={isCorrect ? 'checkmark-circle' : 'close-circle'} 
-              size={64}
-              color={isCorrect ? '#00B894' : '#E74C3C'}
-            />
-            <Text category='h5' style={styles.resultText}>
-              {isCorrect ? 'Correct!' : 'Incorrect'}
-            </Text>
-            <Text category='p1' style={styles.explanation}>
-              {question?.explanation}
-            </Text>
-            {isCorrect && (
-              <Text category='s1' style={styles.pointsEarned}>
-                +{question?.points} points!
+          <Animated.View style={[
+            styles.resultCard, 
+            { 
+              backgroundColor: isCorrect ? '#E8F5E8' : '#FDE8E8',
+              transform: [{ scale: scaleValue }, { translateY: slideValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [50, 0]
+              })}]
+            }
+          ]}>
+            <Card style={styles.resultCardInner}>
+              {/* Success/Failure Icon with Animation */}
+              <Animated.View style={[
+                styles.resultIconContainer,
+                { transform: [{ scale: fadeValue }] }
+              ]}>
+                <Ionicons 
+                  name={isCorrect ? 'checkmark-circle' : 'close-circle'} 
+                  size={80}
+                  color={isCorrect ? '#00B894' : '#E74C3C'}
+                />
+              </Animated.View>
+              
+              <Text category='h4' style={[
+                styles.resultText,
+                { color: isCorrect ? '#00B894' : '#E74C3C' }
+              ]}>
+                {isCorrect ? '🎉 Correct!' : '❌ Incorrect'}
               </Text>
-            )}
-          </Card>
+              
+              {/* Show correct answer if user was wrong */}
+              {!isCorrect && (
+                <View style={styles.correctAnswerContainer}>
+                  <Text category='s1' style={styles.correctAnswerLabel}>
+                    Correct Answer:
+                  </Text>
+                  <Text category='h6' style={styles.correctAnswerText}>
+                    {question?.options[question?.correctAnswer]}
+                  </Text>
+                </View>
+              )}
+              
+              <Text category='p1' style={styles.explanation}>
+                {question?.explanation}
+              </Text>
+              
+              {isCorrect && (
+                <View style={styles.pointsContainer}>
+                  <Text category='h5' style={styles.pointsEarned}>
+                    +{question?.points} XP!
+                  </Text>
+                  {question?.difficulty === 'hard' && (
+                    <Text category='s1' style={styles.bonusText}>
+                      🌟 Hard Question Bonus!
+                    </Text>
+                  )}
+                </View>
+              )}
+              
+              {/* Confetti Effect for Hard Questions */}
+              {showConfetti && (
+                <View style={styles.confettiContainer}>
+                  <Text style={styles.confetti}>🎊🎉✨🎊🎉✨</Text>
+                </View>
+              )}
+            </Card>
+          </Animated.View>
         </View>
       </Layout>
     );
@@ -114,29 +206,59 @@ export default function QuestionScreen({ navigation, route }) {
       
       <View style={styles.content}>
         <Card style={styles.progressCard}>
-          <Text category='c1'>Question 1 of 5</Text>
+          <View style={styles.progressHeader}>
+            <Text category='c1'>Question 1 of 5</Text>
+            <View style={styles.difficultyBadge}>
+              <Text style={[
+                styles.difficultyText,
+                { backgroundColor: 
+                  question.difficulty === 'easy' ? '#00B894' :
+                  question.difficulty === 'medium' ? '#F39C12' : '#E74C3C'
+                }
+              ]}>
+                {question.difficulty.toUpperCase()} • {question.points} XP
+              </Text>
+            </View>
+          </View>
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: '20%' }]} />
           </View>
         </Card>
 
-        <Card style={styles.questionCard}>
-          <Text category='h6' style={styles.questionText}>
-            {question.question}
-          </Text>
-          
-          <RadioGroup
-            selectedIndex={selectedIndex}
-            onChange={setSelectedIndex}
-            style={styles.optionsContainer}
-          >
-            {question.options.map((option, index) => (
-              <Radio key={index} style={styles.option}>
-                {option}
-              </Radio>
-            ))}
-          </RadioGroup>
-        </Card>
+        <Animated.View style={[
+          styles.questionCard,
+          { transform: [{ scale: scaleValue }] }
+        ]}>
+          <Card style={styles.questionCardInner}>
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryText}>
+                📊 {question.category.charAt(0).toUpperCase() + question.category.slice(1)}
+              </Text>
+            </View>
+            
+            <Text category='h6' style={styles.questionText}>
+              {question.question}
+            </Text>
+            
+            <RadioGroup
+              selectedIndex={selectedIndex}
+              onChange={setSelectedIndex}
+              style={styles.optionsContainer}
+            >
+              {question.options.map((option, index) => (
+                <Radio 
+                  key={index} 
+                  style={[
+                    styles.option,
+                    selectedIndex === index && styles.selectedOption
+                  ]}
+                >
+                  {option}
+                </Radio>
+              ))}
+            </RadioGroup>
+          </Card>
+        </Animated.View>
 
         <View style={styles.buttonContainer}>
           <Button
@@ -144,14 +266,14 @@ export default function QuestionScreen({ navigation, route }) {
             appearance='outline'
             onPress={handleSkip}
           >
-            Skip
+            Skip Question
           </Button>
           <Button
-            style={styles.button}
+            style={[styles.button, styles.submitButton]}
             onPress={handleAnswer}
             disabled={selectedIndex === null}
           >
-            Submit
+            Submit Answer
           </Button>
         </View>
       </View>
@@ -171,6 +293,23 @@ const styles = StyleSheet.create({
   progressCard: {
     marginBottom: 16,
   },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  difficultyBadge: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  difficultyText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
   progressBar: {
     height: 8,
     backgroundColor: '#E0E0E0',
@@ -186,15 +325,41 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 16,
   },
+  questionCardInner: {
+    padding: 0,
+  },
+  categoryBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#F0F0FF',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginBottom: 16,
+  },
+  categoryText: {
+    color: '#6C5CE7',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   questionText: {
     marginBottom: 20,
-    lineHeight: 24,
+    lineHeight: 26,
+    fontSize: 18,
+    fontWeight: '600',
   },
   optionsContainer: {
     marginTop: 16,
   },
   option: {
-    marginBottom: 12,
+    marginBottom: 16,
+    backgroundColor: '#FAFAFA',
+    borderRadius: 12,
+    padding: 4,
+  },
+  selectedOption: {
+    backgroundColor: '#E8F5E8',
+    borderColor: '#00B894',
+    borderWidth: 2,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -204,6 +369,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 8,
   },
+  submitButton: {
+    backgroundColor: '#6C5CE7',
+  },
   resultContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -211,26 +379,67 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   resultCard: {
+    width: '100%',
+    borderRadius: 20,
+    padding: 8,
+  },
+  resultCardInner: {
     padding: 32,
     alignItems: 'center',
-    width: '100%',
+    backgroundColor: 'transparent',
   },
-  resultIcon: {
-    width: 64,
-    height: 64,
-    marginBottom: 16,
+  resultIconContainer: {
+    marginBottom: 20,
   },
   resultText: {
-    marginBottom: 16,
+    marginBottom: 20,
     fontWeight: 'bold',
+    fontSize: 24,
+  },
+  correctAnswerContainer: {
+    backgroundColor: '#FFF3E0',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    width: '100%',
+  },
+  correctAnswerLabel: {
+    color: '#F57C00',
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  correctAnswerText: {
+    color: '#E65100',
+    fontSize: 16,
   },
   explanation: {
     textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 22,
+    marginBottom: 20,
+    lineHeight: 24,
+    fontSize: 16,
+  },
+  pointsContainer: {
+    alignItems: 'center',
   },
   pointsEarned: {
     color: '#00B894',
     fontWeight: 'bold',
+    fontSize: 20,
+  },
+  bonusText: {
+    color: '#FFD700',
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
+  confettiContainer: {
+    position: 'absolute',
+    top: -20,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  confetti: {
+    fontSize: 24,
+    letterSpacing: 4,
   },
 });
