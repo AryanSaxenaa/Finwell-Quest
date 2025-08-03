@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Dimensions, Text as RNText } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Dimensions, Text as RNText, Alert } from 'react-native';
 import { 
   Layout, 
   Text, 
@@ -18,7 +18,7 @@ export default function AIChat({ navigation }) {
   const [message, setMessage] = useState('');
   const { chatHistory, aiMode, addMessage, setAIMode } = useChatStore();
   const { totalSpent, expenses } = useExpenseStore();
-  const { score, level } = useGameStore();
+  const { score, level, aiTokens, useAIToken, hasAITokens } = useGameStore();
 
   const aiModes = [
     { title: 'Advisor', value: 'advisor' },
@@ -28,6 +28,28 @@ export default function AIChat({ navigation }) {
 
   const handleSend = () => {
     if (!message.trim()) return;
+
+    // Check if user has tokens
+    if (!hasAITokens()) {
+      Alert.alert(
+        'No AI Tokens! 🪙',
+        'You need tokens to chat with the AI advisor. Earn tokens by learning topics in the Learn section!',
+        [
+          {
+            text: 'Go to Learn',
+            onPress: () => navigation.getParent()?.navigate('LearnTab')
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel'
+          }
+        ]
+      );
+      return;
+    }
+
+    // Use a token
+    useAIToken();
 
     // Add user message
     addMessage({
@@ -77,14 +99,26 @@ export default function AIChat({ navigation }) {
   );
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
+    <Layout style={styles.container}>
       <TopNavigation title='AI Assistant' alignment='center' />
       
-      <View style={styles.content}>
+      <KeyboardAvoidingView 
+        style={styles.content}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
+        <Card style={styles.tokenCard}>
+          <View style={styles.tokenHeader}>
+            <Ionicons name="diamond" size={20} color="#FFD700" />
+            <Text category='s1' style={styles.tokenTitle}>AI Tokens: {aiTokens}</Text>
+          </View>
+          <Text category='c1' style={styles.tokenSubtitle}>
+            {aiTokens > 0 
+              ? 'Each message costs 1 token' 
+              : 'Earn tokens by learning topics!'}
+          </Text>
+        </Card>
+
         <Card style={styles.modeCard}>
           <Text category='s1' style={styles.modeTitle}>AI Personality:</Text>
           <ButtonGroup style={styles.modeButtons}>
@@ -136,8 +170,8 @@ export default function AIChat({ navigation }) {
             disabled={!message.trim()}
           />
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </Layout>
   );
 }
 
@@ -151,6 +185,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
+  },
+  tokenCard: {
+    marginBottom: 16,
+    backgroundColor: '#FFF9E6',
+    borderLeftWidth: 4,
+    borderLeftColor: '#FFD700',
+  },
+  tokenHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  tokenTitle: {
+    marginLeft: 8,
+    fontWeight: 'bold',
+    color: '#D4AF37',
+  },
+  tokenSubtitle: {
+    color: '#8B7355',
+    fontSize: 12,
   },
   modeCard: {
     marginBottom: 16,
@@ -170,14 +224,14 @@ const styles = StyleSheet.create({
   },
   chatContainer: {
     flex: 1,
-  chatContainer: {
-    flex: 1,
     marginBottom: 8,
   },
   chatContent: {
     flexGrow: 1,
     paddingBottom: 20,
-  },textAlign: 'center',
+  },
+  emptyChat: {
+    textAlign: 'center',
     fontStyle: 'italic',
     opacity: 0.6,
     padding: 20,

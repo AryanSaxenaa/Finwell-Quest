@@ -17,6 +17,7 @@ export const useGameStore = create((set, get) => ({
   position: 0,
   currentQuestion: null,
   lastLevelUp: false,
+  aiTokens: 3, // Start with 3 free tokens
   gameStats: {
     totalGamesPlayed: 0,
     totalScore: 0,
@@ -203,6 +204,25 @@ export const useGameStore = create((set, get) => ({
       lastLevelUp: leveledUp,
     };
   }),
+  
+  // AI Token Management
+  useAIToken: () => set((state) => ({
+    aiTokens: Math.max(0, state.aiTokens - 1)
+  })),
+  
+  earnAITokens: (amount) => set((state) => ({
+    aiTokens: state.aiTokens + amount
+  })),
+  
+  hasAITokens: () => {
+    const state = get();
+    return state.aiTokens > 0;
+  },
+  
+  getAITokens: () => {
+    const state = get();
+    return state.aiTokens;
+  },
 }));
 
 // Expense store
