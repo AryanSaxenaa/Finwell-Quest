@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { 
   Layout, 
@@ -26,8 +26,15 @@ export default function GameHome({ navigation }) {
     gameStats, 
     getXPForNextLevel, 
     getXPProgress,
-    resetGame
+    resetGame,
+    dailyChallenge,
+    checkDailyChallengeReset
   } = useGameStore();
+
+  useEffect(() => {
+    // Check if daily challenge needs to be reset for new day
+    checkDailyChallengeReset();
+  }, []);
 
   const handleStartGame = () => {
     resetGame(); // Reset game state before starting
@@ -55,17 +62,27 @@ export default function GameHome({ navigation }) {
       <View style={styles.challengeHeader}>
         <Ionicons name="calendar" size={20} color="#D4AF37" style={styles.challengeIcon} />
         <Text category='h6' style={styles.challengeTitle}>Daily Challenge</Text>
+        {dailyChallenge.completed && (
+          <Ionicons name="checkmark-circle" size={20} color="#00D68F" style={{ marginLeft: 8 }} />
+        )}
       </View>
       <Text category='p2' style={styles.challengeText}>
-        Complete today's challenge for +50 XP!
+        {dailyChallenge.completed 
+          ? dailyChallenge.wasCorrect 
+            ? `Completed! You earned ${dailyChallenge.xpEarned} XP!`
+            : 'Completed! Come back tomorrow for a new challenge.'
+          : 'Complete today\'s challenge for +50 XP!'
+        }
       </Text>
-      <Button
-        style={styles.challengeButton}
-        size='small'
-        onPress={() => {/* Navigate to challenge */}}
-      >
-        View Challenge
-      </Button>
+      {!dailyChallenge.completed && (
+        <Button
+          style={styles.challengeButton}
+          size='small'
+          onPress={() => navigation.navigate('DailyChallenge')}
+        >
+          View Challenge
+        </Button>
+      )}
     </Card>
   );
 
@@ -382,6 +399,10 @@ const styles = StyleSheet.create({
   challengeButton: {
     backgroundColor: '#2E384D',
     borderColor: '#2E384D',
+  },
+  completedButton: {
+    backgroundColor: '#8F9BB3',
+    borderColor: '#8F9BB3',
   },
   challengeReward: {
     color: '#FFD700',

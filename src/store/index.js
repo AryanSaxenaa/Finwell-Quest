@@ -34,11 +34,18 @@ export const useGameStore = create((set, get) => ({
     streaks: {
       currentStreak: 0,
       longestStreak: 0,
-    },
-    badges: [],
+  },
+  badges: [],
   },
   
-  // Level progression: Every 100 XP = 1 level
+  // Daily Challenge
+  dailyChallenge: {
+    date: null,
+    question: null,
+    completed: false,
+    wasCorrect: false,
+    xpEarned: 0,
+  },  // Level progression: Every 100 XP = 1 level
   calculateLevel: (xp) => Math.floor(xp / 100) + 1,
   getXPForNextLevel: (currentXP) => (Math.floor(currentXP / 100) + 1) * 100,
   getXPProgress: (currentXP) => currentXP % 100,
@@ -147,6 +154,55 @@ export const useGameStore = create((set, get) => ({
       bestScore: Math.max(state.gameStats.bestScore, state.score),
     }
   })),
+  
+  // Daily Challenge methods
+  generateDailyChallenge: (question, date) => set({
+    dailyChallenge: {
+      date,
+      question,
+      completed: false,
+      wasCorrect: false,
+      xpEarned: 0,
+    }
+  }),
+  
+  completeDailyChallenge: (wasCorrect, xpEarned) => set((state) => ({
+    dailyChallenge: {
+      ...state.dailyChallenge,
+      completed: true,
+      wasCorrect,
+      xpEarned,
+    }
+  })),
+  
+  checkDailyChallengeReset: () => {
+    const today = new Date().toDateString();
+    const state = get();
+    
+    if (state.dailyChallenge.date !== today) {
+      set({
+        dailyChallenge: {
+          date: null,
+          question: null,
+          completed: false,
+          wasCorrect: false,
+          xpEarned: 0,
+        }
+      });
+    }
+  },
+  
+  addXP: (amount) => set((state) => {
+    const newXP = state.xp + amount;
+    const newLevel = Math.floor(newXP / 100) + 1;
+    const leveledUp = newLevel > state.level;
+    
+    return {
+      xp: newXP,
+      level: newLevel,
+      lastLevelUp: leveledUp,
+    };
+  }),
 }));
 
 // Expense store
