@@ -53,15 +53,19 @@ export default function GameHome({ navigation }) {
   const DailyChallengeCard = () => (
     <Card style={styles.challengeCard}>
       <View style={styles.challengeHeader}>
-        <CalendarIcon style={styles.challengeIcon} />
-        <Text category='h6'>Daily Challenge</Text>
+        <Ionicons name="calendar" size={20} color="#D4AF37" style={styles.challengeIcon} />
+        <Text category='h6' style={styles.challengeTitle}>Daily Challenge</Text>
       </View>
       <Text category='p2' style={styles.challengeText}>
-        Answer 5 questions correctly to earn a 2x XP bonus!
+        Complete today's challenge for +50 XP!
       </Text>
-      <Text category='c1' style={styles.challengeReward}>
-        Reward: 100 XP
-      </Text>
+      <Button
+        style={styles.challengeButton}
+        size='small'
+        onPress={() => {/* Navigate to challenge */}}
+      >
+        View Challenge
+      </Button>
     </Card>
   );
 
@@ -71,6 +75,26 @@ export default function GameHome({ navigation }) {
         title='Game Center'
         alignment='center'
       />
+      
+      {/* Top Section with Level Progress and Leaderboard */}
+      <View style={styles.topSection}>
+        <Button
+          style={styles.compactLevelButton}
+          appearance='ghost'
+          accessoryLeft={() => <Ionicons name="trophy" size={20} color="#FFD700" />}
+        >
+          Level {level} • {xpProgress} XP
+        </Button>
+        
+        <Button
+          style={styles.compactLeaderboardButton}
+          appearance='ghost'
+          onPress={() => navigation.navigate('SocialTab', { screen: 'Leaderboard' })}
+          accessoryLeft={() => <Ionicons name="podium" size={20} color="#6C5CE7" />}
+        >
+          Leaderboard
+        </Button>
+      </View>
       
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <Card style={styles.playCard}>
@@ -83,8 +107,9 @@ export default function GameHome({ navigation }) {
             size='large'
             accessoryLeft={PlayIcon}
             onPress={handleStartGame}
+            appearance='filled'
           >
-            Play Dice Game
+            <Text style={styles.playButtonText}>Play Now</Text>
           </Button>
         </Card>
 
@@ -95,36 +120,22 @@ export default function GameHome({ navigation }) {
             icon={<StarIcon />}
           />
           <StatCard 
-            title="Level" 
-            value={level} 
-            icon={<TrophyIcon />}
-          />
-        </View>
-
-        {/* XP Progress Card */}
-        <Card style={styles.xpCard}>
-          <View style={styles.xpHeader}>
-            <Text category='h6'>Level {level} Progress</Text>
-            <Text category='c1'>{xpProgress}/100 XP</Text>
-          </View>
-          <View style={styles.xpProgressBar}>
-            <View style={[styles.xpProgressFill, { width: `${progressPercentage}%` }]} />
-          </View>
-          <Text category='c1' style={styles.xpText}>
-            {100 - xpProgress} XP until Level {level + 1}
-          </Text>
-        </Card>
-
-        <View style={styles.statsContainer}>
-          <StatCard 
             title="Experience" 
             value={xp} 
             icon={<FlashIcon />}
           />
+        </View>
+
+        <View style={styles.statsContainer}>
           <StatCard 
             title="Lives Left" 
             value={lives} 
             icon={<HeartIcon />}
+          />
+          <StatCard 
+            title="Best Score" 
+            value={gameStats.bestScore} 
+            icon={<TrophyIcon />}
           />
         </View>
 
@@ -151,14 +162,6 @@ export default function GameHome({ navigation }) {
             </View>
           </View>
         </Card>
-
-        <Button
-          style={styles.leaderboardButton}
-          appearance='outline'
-          onPress={() => navigation.navigate('SocialTab', { screen: 'Leaderboard' })}
-        >
-          View Leaderboard
-        </Button>
       </ScrollView>
     </Layout>
   );
@@ -172,6 +175,103 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 16,
+  },
+  topSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 4,
+    gap: 12,
+  },
+  levelProgressContainer: {
+    flex: 1,
+    marginRight: 16,
+  },
+  levelProgressCard: {
+    flex: 1,
+    marginRight: 16,
+    backgroundColor: '#FFF',
+    borderColor: '#E4E9F2',
+    borderWidth: 1,
+  levelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2E384D',
+    marginLeft: 6,
+  },shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  levelInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  xpProgressContainer: {
+    marginTop: 4,
+  },
+  levelProgressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  levelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2E384D',
+  },
+  xpText: {
+    fontSize: 12,
+    color: '#8F9BB3',
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: '#EDF1F7',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#6C5CE7',
+    borderRadius: 4,
+  },
+  compactLevelButton: {
+    backgroundColor: '#FFF',
+    borderColor: '#E4E9F2',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  compactLeaderboardButton: {
+    backgroundColor: '#FFF',
+    borderColor: '#E4E9F2',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   playCard: {
     marginBottom: 20,
@@ -191,8 +291,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   playButton: {
-    backgroundColor: 'white',
-    borderColor: 'white',
+    backgroundColor: '#2E384D',
+    borderColor: '#2E384D',
+    borderRadius: 8,
+  },
+  playButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -246,9 +352,16 @@ const styles = StyleSheet.create({
   },
   challengeCard: {
     marginBottom: 16,
-    backgroundColor: '#FFF9E6',
-    borderLeftWidth: 4,
-    borderLeftColor: '#FFD700',
+    backgroundColor: '#FFD700',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   challengeHeader: {
     flexDirection: 'row',
@@ -256,12 +369,19 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   challengeIcon: {
-    width: 24,
-    height: 24,
     marginRight: 8,
   },
+  challengeTitle: {
+    color: '#2E384D',
+    fontWeight: 'bold',
+  },
   challengeText: {
-    marginBottom: 8,
+    marginBottom: 12,
+    color: '#2E384D',
+  },
+  challengeButton: {
+    backgroundColor: '#2E384D',
+    borderColor: '#2E384D',
   },
   challengeReward: {
     color: '#FFD700',
