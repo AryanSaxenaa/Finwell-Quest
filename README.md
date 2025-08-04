@@ -45,34 +45,15 @@ FinWell Quest is a modern, gamified personal finance management app built with R
 
 
 Screenshots
-Home Page (before adding any transaction or Connecting the bank account)
 <img src="https://github.com/user-attachments/assets/8d69be0d-8362-4af5-b00a-529fecbd73b9" width="400"/>
-
-Connecting bank using Plaid API
 <img src="https://github.com/user-attachments/assets/5a59bcff-5179-4d33-bfcf-f96cc1bcac1e" width="400"/>
-
-Home Page (After adding transactions)
 <img src="https://github.com/user-attachments/assets/92546708-94da-4f59-826c-28bf6bdade94" width="400"/>
-
-Add Expense
 <img src="https://github.com/user-attachments/assets/1a3e2c13-75eb-440c-b02c-2eb977524907" width="400"/>
-
-View History
 <img src="https://github.com/user-attachments/assets/55c769af-5692-4582-8011-085355c07e2d" width="400"/>
-
-Game Center
 <img src="https://github.com/user-attachments/assets/b4775418-4b32-4fdf-8cd1-c99b7f97c571" width="400"/>
-
-Game Board
 <img src="https://github.com/user-attachments/assets/cf821ff1-6539-4316-bfd6-088c84c4ced7" width="400"/>
-
-Leaderboard
 <img src="https://github.com/user-attachments/assets/9e602412-871b-45c8-ad82-342ab91a9527" width="400"/>
-
-Learning Hub
 <img src="https://github.com/user-attachments/assets/a5ee3eef-d0cb-4961-b31b-1f4821ab25ca" width="400"/>
-
-AI Advisor
 <img src="https://github.com/user-attachments/assets/a6ed6db4-8dd7-4f11-930e-3d5cfe504163" width="400"/> <img src="https://github.com/user-attachments/assets/4c58ed5b-7cab-4f95-b43a-10facf7766e5" width="400"/>
 
 
