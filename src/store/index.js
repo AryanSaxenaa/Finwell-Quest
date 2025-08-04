@@ -143,7 +143,7 @@ export const useGameStore = create((set, get) => ({
   }),
   
   movePlayer: (steps) => set((state) => ({ 
-    position: (state.position + steps) % 25 
+    position: (state.position + steps) % 36 
   })),
   
   setCurrentQuestion: (question) => set({ currentQuestion: question }),

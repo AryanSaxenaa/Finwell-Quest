@@ -140,6 +140,171 @@ export const QUESTIONS_DATABASE = [
     correctAnswer: 1,
     explanation: "The 50/30/20 rule suggests allocating 50% to needs, 30% to wants, and 20% to savings and debt repayment.",
     points: 20
+  },
+  {
+    id: 11,
+    category: QUESTION_CATEGORIES.INVESTING,
+    difficulty: DIFFICULTY_LEVELS.EASY,
+    question: "What is compound interest?",
+    options: [
+      "Interest paid only on the original amount",
+      "Interest paid on both principal and accumulated interest",
+      "A type of loan interest",
+      "Interest that decreases over time"
+    ],
+    correctAnswer: 1,
+    explanation: "Compound interest is interest calculated on both the initial principal and the accumulated interest from previous periods.",
+    points: 10
+  },
+  {
+    id: 12,
+    category: QUESTION_CATEGORIES.CREDIT,
+    difficulty: DIFFICULTY_LEVELS.EASY,
+    question: "What is a good credit score range?",
+    options: ["300-500", "500-600", "600-700", "700-850"],
+    correctAnswer: 3,
+    explanation: "A credit score between 700-850 is generally considered good to excellent, helping you qualify for better loan terms.",
+    points: 10
+  },
+  {
+    id: 13,
+    category: QUESTION_CATEGORIES.SAVING,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    question: "What is the best strategy for building an emergency fund?",
+    options: [
+      "Invest in stocks for higher returns",
+      "Keep it in a high-yield savings account",
+      "Put it in long-term CDs",
+      "Keep cash under your mattress"
+    ],
+    correctAnswer: 1,
+    explanation: "Emergency funds should be easily accessible, so a high-yield savings account is ideal for earning interest while maintaining liquidity.",
+    points: 15
+  },
+  {
+    id: 14,
+    category: QUESTION_CATEGORIES.DEBT,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    question: "What is the debt avalanche method?",
+    options: [
+      "Pay minimum on all debts, extra on lowest balance",
+      "Pay minimum on all debts, extra on highest interest rate",
+      "Pay equal amounts on all debts",
+      "Only pay the minimum on all debts"
+    ],
+    correctAnswer: 1,
+    explanation: "The debt avalanche method focuses on paying off the highest interest rate debt first to minimize total interest paid.",
+    points: 15
+  },
+  {
+    id: 15,
+    category: QUESTION_CATEGORIES.INVESTING,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    question: "What does diversification mean in investing?",
+    options: [
+      "Putting all money in one stock",
+      "Spreading investments across different assets",
+      "Only investing in bonds",
+      "Timing the market perfectly"
+    ],
+    correctAnswer: 1,
+    explanation: "Diversification means spreading investments across different asset classes, sectors, and securities to reduce risk.",
+    points: 15
+  },
+  {
+    id: 16,
+    category: QUESTION_CATEGORIES.INSURANCE,
+    difficulty: DIFFICULTY_LEVELS.EASY,
+    question: "What is the primary purpose of health insurance?",
+    options: [
+      "To make money from investments",
+      "To protect against high medical costs",
+      "To provide tax deductions",
+      "To build credit score"
+    ],
+    correctAnswer: 1,
+    explanation: "Health insurance protects you from potentially catastrophic medical expenses and provides access to healthcare.",
+    points: 10
+  },
+  {
+    id: 17,
+    category: QUESTION_CATEGORIES.BUDGETING,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    question: "What is zero-based budgeting?",
+    options: [
+      "Having zero money left over",
+      "Starting your budget from zero each month",
+      "Spending zero dollars",
+      "Having zero debt"
+    ],
+    correctAnswer: 1,
+    explanation: "Zero-based budgeting means every dollar of income is assigned a purpose, whether for expenses, savings, or debt payment.",
+    points: 15
+  },
+  {
+    id: 18,
+    category: QUESTION_CATEGORIES.CREDIT,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    question: "What factors affect your credit score the most?",
+    options: [
+      "Age and income",
+      "Payment history and credit utilization",
+      "Job title and education",
+      "Marital status and location"
+    ],
+    correctAnswer: 1,
+    explanation: "Payment history (35%) and credit utilization (30%) are the two most important factors affecting your credit score.",
+    points: 15
+  },
+  {
+    id: 19,
+    category: QUESTION_CATEGORIES.INVESTING,
+    difficulty: DIFFICULTY_LEVELS.HARD,
+    question: "What is the difference between a traditional and Roth IRA?",
+    options: [
+      "No difference, they're the same",
+      "Traditional is tax-deferred, Roth is tax-free in retirement",
+      "Roth has higher contribution limits",
+      "Traditional is only for young people"
+    ],
+    correctAnswer: 1,
+    explanation: "Traditional IRAs offer tax deductions now but taxable withdrawals in retirement, while Roth IRAs use after-tax dollars but provide tax-free retirement withdrawals.",
+    points: 20
+  },
+  {
+    id: 20,
+    category: QUESTION_CATEGORIES.DEBT,
+    difficulty: DIFFICULTY_LEVELS.HARD,
+    question: "What is the debt-to-income ratio that lenders prefer?",
+    options: ["Below 20%", "Below 36%", "Below 50%", "Below 70%"],
+    correctAnswer: 1,
+    explanation: "Most lenders prefer a debt-to-income ratio below 36%, with no more than 28% going toward housing expenses.",
+    points: 20
+  },
+  {
+    id: 21,
+    category: QUESTION_CATEGORIES.SAVING,
+    difficulty: DIFFICULTY_LEVELS.HARD,
+    question: "What is the rule of 72?",
+    options: [
+      "Save 72% of your income",
+      "A formula to estimate how long it takes to double your money",
+      "Retire at age 72",
+      "Keep 72 months of expenses saved"
+    ],
+    correctAnswer: 1,
+    explanation: "The rule of 72 estimates how many years it takes to double your investment by dividing 72 by the annual interest rate.",
+    points: 20
+  },
+  {
+    id: 22,
+    category: QUESTION_CATEGORIES.INSURANCE,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    question: "What type of life insurance is typically cheaper?",
+    options: ["Whole life", "Term life", "Universal life", "Variable life"],
+    correctAnswer: 1,
+    explanation: "Term life insurance is typically much cheaper than permanent life insurance policies because it only provides coverage for a specific period.",
+    points: 15
   }
 ];
 

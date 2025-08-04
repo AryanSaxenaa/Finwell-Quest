@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Alert } from 'react-native';
+import { View, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native';
 import { 
   Layout, 
   Text, 
@@ -14,19 +14,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 
 const { width } = Dimensions.get('window');
-const GRID_SIZE = 5;
-const TILE_SIZE = (width - 80) / GRID_SIZE;
+const GRID_SIZE = 6;
+const TILE_SIZE = (width - 48) / GRID_SIZE; // Reduced padding for more compact 6x6 grid
 
 const BackIcon = (props) => <Ionicons name="arrow-back" size={24} color="black" />;
 const DiceIcon = (props) => <Ionicons name="cube-outline" size={24} color="white" />;
 const PersonIcon = (props) => <Ionicons name="person-outline" size={20} color="white" />;
 
-// Enhanced board tiles with new types
-const BOARD_TILES = Array.from({ length: 25 }, (_, i) => {
-  if (i % 7 === 0 && i !== 0) return { id: i, type: 'trap' };
-  if (i % 5 === 0 && i !== 0) return { id: i, type: 'investment' };
+// Enhanced board tiles with new types for 6x6 grid (36 tiles)
+const BOARD_TILES = Array.from({ length: 36 }, (_, i) => {
+  if (i % 8 === 0 && i !== 0) return { id: i, type: 'trap' };
+  if (i % 6 === 0 && i !== 0) return { id: i, type: 'investment' };
   if (i % 3 === 0) return { id: i, type: 'question' };
-  if (i % 4 === 0 && i !== 0) return { id: i, type: 'bonus' };
+  if (i % 5 === 0 && i !== 0) return { id: i, type: 'bonus' };
   return { id: i, type: 'normal' };
 });
 
@@ -124,7 +124,7 @@ export default function GameBoard({ navigation }) {
       setDiceValue(roll);
       movePlayer(roll);
       
-      const newPosition = (position + roll) % 25;
+      const newPosition = (position + roll) % 36;
       const tile = BOARD_TILES[newPosition];
       
       handleTileEffect(tile, newPosition);
@@ -241,46 +241,52 @@ export default function GameBoard({ navigation }) {
           accessoryLeft={renderBackAction}
           style={styles.topNavigation}
         />
-      
-      <View style={styles.content}>
-        <Card style={styles.statsCard}>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text category='h6'>{score}</Text>
-              <Text category='c1'>Score</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text category='h6'>{lives}</Text>
-              <Text category='c1'>Lives</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text category='h6'>{level}</Text>
-              <Text category='c1'>Level</Text>
+        
+        <View style={styles.content}>
+          {/* Stats Section */}
+          <View style={styles.statsSection}>
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Text category='h6' style={styles.statValue}>{score}</Text>
+                <Text category='c1' style={styles.statLabel}>Score</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text category='h6' style={styles.statValue}>{lives}</Text>
+                <Text category='c1' style={styles.statLabel}>Lives</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text category='h6' style={styles.statValue}>{level}</Text>
+                <Text category='c1' style={styles.statLabel}>Level</Text>
+              </View>
             </View>
           </View>
-        </Card>
 
-        <Card style={styles.boardCard}>
-          <View style={styles.board}>
-            {renderBoard()}
+          {/* Game Board */}
+          <View style={styles.boardSection}>
+            <View style={styles.board}>
+              {renderBoard()}
+            </View>
           </View>
-        </Card>
 
-        <Card style={styles.diceCard}>
-          <Text category='h6' style={styles.diceTitle}>Roll to Move</Text>
-          {diceValue && (
-            <Text category='h4' style={styles.diceValue}>🎲 {diceValue}</Text>
-          )}
-          <Button
-            style={styles.rollButton}
-            size='large'
-            accessoryLeft={DiceIcon}
-            onPress={rollDice}
-            disabled={isRolling}
-          >
-            {isRolling ? 'Rolling...' : 'Roll Dice'}
-          </Button>
-        </Card>
+          {/* Dice Section */}
+          <View style={styles.diceSection}>
+            <Text category='h6' style={styles.diceTitle}>Roll to Move</Text>
+            <View style={styles.diceValueContainer}>
+              {diceValue && (
+                <Text category='h4' style={styles.diceValue}>🎲 {diceValue}</Text>
+              )}
+            </View>
+            <Button
+              style={styles.rollButton}
+              size='large'
+              accessoryLeft={DiceIcon}
+              onPress={rollDice}
+              disabled={isRolling}
+            >
+              {isRolling ? 'Rolling...' : 'Roll Dice'}
+            </Button>
+          </View>
+        </View>
 
         {/* Tile Effect Modal */}
         <Modal
@@ -348,7 +354,6 @@ export default function GameBoard({ navigation }) {
             </Button>
           </Card>
         </Modal>
-      </View>
     </Layout>
     </SafeAreaView>
   );
@@ -369,10 +374,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: 12,
+    paddingBottom: 140, // Extra padding to prevent overlap with bottom nav
   },
-  statsCard: {
-    marginBottom: 16,
+  statsSection: {
+    marginBottom: 12,
+    paddingVertical: 12,
   },
   statsRow: {
     flexDirection: 'row',
@@ -381,9 +388,17 @@ const styles = StyleSheet.create({
   statItem: {
     alignItems: 'center',
   },
-  boardCard: {
-    marginBottom: 16,
-    padding: 16,
+  statValue: {
+    color: '#6C5CE7',
+    fontWeight: 'bold',
+  },
+  statLabel: {
+    color: '#8F9BB3',
+    marginTop: 4,
+  },
+  boardSection: {
+    marginBottom: 12,
+    alignItems: 'center',
   },
   board: {
     alignSelf: 'center',
@@ -394,10 +409,10 @@ const styles = StyleSheet.create({
   tile: {
     width: TILE_SIZE,
     height: TILE_SIZE,
-    margin: 1,
+    margin: 0.5,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 4,
+    borderRadius: 3,
     position: 'relative',
   },
   playerTile: {
@@ -405,12 +420,12 @@ const styles = StyleSheet.create({
     borderColor: '#FFD700',
   },
   tileNumber: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
     color: 'white',
   },
   tileIcon: {
-    fontSize: 16,
+    fontSize: 14,
     position: 'absolute',
     bottom: 2,
   },
@@ -474,14 +489,26 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
   },
-  diceCard: {
+  diceSection: {
     alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
   },
   diceTitle: {
     marginBottom: 8,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2E384D',
+  },
+  diceValueContainer: {
+    height: 50, // Fixed height to prevent layout shift
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   diceValue: {
-    marginBottom: 16,
+    marginBottom: 0,
+    color: '#6C5CE7',
   },
   rollButton: {
     minWidth: 150,
