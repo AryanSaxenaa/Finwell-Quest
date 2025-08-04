@@ -523,28 +523,28 @@ export const useBudgetStore = create((set, get) => ({
       id: 1, 
       category: 'Housing', 
       limit: 1000, 
-      spent: 800, 
+      spent: 0, // Template budget - no initial spending
       color: '#8B4513' 
     },
     { 
       id: 2, 
       category: 'Transport', 
       limit: 200, 
-      spent: 45, 
+      spent: 0, // Template budget - no initial spending
       color: '#36A2EB' 
     },
     { 
       id: 3, 
       category: 'Food', 
       limit: 400, 
-      spent: 195, 
+      spent: 0, // Template budget - no initial spending
       color: '#FF9F40' 
     },
     { 
       id: 4, 
       category: 'Entertainment', 
       limit: 150, 
-      spent: 80, 
+      spent: 0, // Template budget - no initial spending
       color: '#9966FF' 
     },
   ],

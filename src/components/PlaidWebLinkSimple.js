@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, View, StyleSheet, Alert } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { Button, Text } from '@ui-kitten/components';
+import { BrutalCard, BrutalButton, brutalTextStyle, NeoBrutalism } from './BrutalComponents';
+import { Text } from 'react-native';
 
 export default function PlaidWebLinkSimple({ linkToken, onSuccess, onExit, visible, onClose }) {
   const [status, setStatus] = useState('Ready to connect');
@@ -134,24 +135,23 @@ export default function PlaidWebLinkSimple({ linkToken, onSuccess, onExit, visib
       onRequestClose={onClose}
     >
       <View style={styles.container}>
-        <View style={styles.header}>
+        <BrutalCard style={styles.header}>
           <View style={styles.headerTop}>
-            <Text category="h6" style={styles.headerTitle}>
-              Connect Bank Account
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.headerTitle]}>
+              🏦 CONNECT BANK ACCOUNT
             </Text>
-            <Button
+            <BrutalButton
               size="small"
-              appearance="ghost"
               onPress={onClose}
               style={styles.closeButton}
             >
-              Close
-            </Button>
+              ✕ CLOSE
+            </BrutalButton>
           </View>
-          <Text category="c1" style={styles.statusText}>
-            {status}
+          <Text style={[brutalTextStyle('caption', 'medium', 'black'), styles.statusText]}>
+            {status.toUpperCase()}
           </Text>
-        </View>
+        </BrutalCard>
         
         <WebView
           source={{ uri: plaidDirectUrl }}
@@ -227,11 +227,11 @@ export default function PlaidWebLinkSimple({ linkToken, onSuccess, onExit, visib
           onLoadEnd={() => setStatus('Plaid Link loaded')}
         />
         
-        <View style={styles.footer}>
-          <Text category="c2" style={styles.helpText}>
-            If you experience any issues, please close and try again
+        <BrutalCard style={styles.footer}>
+          <Text style={[brutalTextStyle('caption', 'medium', 'black'), styles.helpText]}>
+            🔄 IF YOU EXPERIENCE ANY ISSUES, PLEASE CLOSE AND TRY AGAIN
           </Text>
-        </View>
+        </BrutalCard>
       </View>
     </Modal>
   );
@@ -240,14 +240,15 @@ export default function PlaidWebLinkSimple({ linkToken, onSuccess, onExit, visib
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   header: {
     flexDirection: 'column',
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    borderBottomWidth: 3,
+    borderBottomColor: NeoBrutalism.colors.black,
     paddingTop: 50, // Account for status bar
+    backgroundColor: NeoBrutalism.colors.neonYellow,
   },
   headerTop: {
     flexDirection: 'row',
@@ -259,10 +260,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 1,
     textAlign: 'center',
+    color: NeoBrutalism.colors.black,
   },
   statusText: {
     textAlign: 'center',
-    color: '#666',
+    color: NeoBrutalism.colors.black,
     fontSize: 12,
   },
   closeButton: {
@@ -273,11 +275,12 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
+    borderTopWidth: 3,
+    borderTopColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   helpText: {
     textAlign: 'center',
-    color: '#666',
+    color: NeoBrutalism.colors.black,
   },
 });

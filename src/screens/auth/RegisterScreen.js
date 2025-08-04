@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, SafeAreaView } from 'react-native';
 import { 
-  Layout, 
   Text, 
   Input, 
-  Button, 
   CheckBox
 } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store';
+import { BrutalCard, BrutalButton, brutalTextStyle } from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 export default function RegisterScreen({ navigation }) {
   const [formData, setFormData] = useState({
@@ -61,117 +61,163 @@ export default function RegisterScreen({ navigation }) {
   );
 
   return (
-    <Layout style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text category='h2' style={styles.title}>Create Account</Text>
-        <Text category='s1' style={styles.subtitle}>Join thousands learning financial literacy</Text>
+        <Text style={[brutalTextStyle.title, styles.title]}>CREATE ACCOUNT</Text>
+        <Text style={[brutalTextStyle.body, styles.subtitle]}>JOIN THE FINANCIAL REVOLUTION</Text>
 
-        <Input
-          style={styles.input}
-          placeholder='Full Name'
-          value={formData.name}
-          onChangeText={(value) => updateField('name', value)}
-        />
+        <BrutalCard style={styles.formContainer}>
+          <Input
+            style={styles.input}
+            placeholder='FULL NAME'
+            value={formData.name}
+            onChangeText={(value) => updateField('name', value)}
+            textStyle={styles.inputText}
+          />
 
-        <Input
-          style={styles.input}
-          placeholder='Email'
-          value={formData.email}
-          onChangeText={(value) => updateField('email', value)}
-          keyboardType='email-address'
-          autoCapitalize='none'
-        />
+          <Input
+            style={styles.input}
+            placeholder='EMAIL ADDRESS'
+            value={formData.email}
+            onChangeText={(value) => updateField('email', value)}
+            keyboardType='email-address'
+            autoCapitalize='none'
+            textStyle={styles.inputText}
+          />
 
-        <Input
-          style={styles.input}
-          placeholder='Username'
-          value={formData.username}
-          onChangeText={(value) => updateField('username', value)}
-          autoCapitalize='none'
-        />
+          <Input
+            style={styles.input}
+            placeholder='USERNAME'
+            value={formData.username}
+            onChangeText={(value) => updateField('username', value)}
+            autoCapitalize='none'
+            textStyle={styles.inputText}
+          />
 
-        <Input
-          style={styles.input}
-          placeholder='Password'
-          value={formData.password}
-          onChangeText={(value) => updateField('password', value)}
-          secureTextEntry={secureTextEntry}
-          accessoryRight={renderPasswordIcon}
-          onTouchEnd={() => setSecureTextEntry(!secureTextEntry)}
-        />
+          <Input
+            style={styles.input}
+            placeholder='PASSWORD'
+            value={formData.password}
+            onChangeText={(value) => updateField('password', value)}
+            secureTextEntry={secureTextEntry}
+            accessoryRight={renderPasswordIcon}
+            onTouchEnd={() => setSecureTextEntry(!secureTextEntry)}
+            textStyle={styles.inputText}
+          />
 
-        <Input
-          style={styles.input}
-          placeholder='Confirm Password'
-          value={formData.confirmPassword}
-          onChangeText={(value) => updateField('confirmPassword', value)}
-          secureTextEntry={secureTextEntry}
-        />
+          <Input
+            style={styles.input}
+            placeholder='CONFIRM PASSWORD'
+            value={formData.confirmPassword}
+            onChangeText={(value) => updateField('confirmPassword', value)}
+            secureTextEntry={secureTextEntry}
+            textStyle={styles.inputText}
+          />
 
-        <CheckBox
-          style={styles.checkbox}
-          checked={agreedToTerms}
-          onChange={setAgreedToTerms}
-        >
-          I agree to the Terms & Conditions
-        </CheckBox>
+          <CheckBox
+            style={styles.checkbox}
+            checked={agreedToTerms}
+            onChange={setAgreedToTerms}
+            textStyle={[brutalTextStyle.body, { color: NeoBrutalism.colors.black }]}
+          >
+            I AGREE TO TERMS & CONDITIONS
+          </CheckBox>
 
-        <Button
-          style={styles.registerButton}
-          onPress={handleRegister}
-          disabled={loading}
-        >
-          {loading ? 'Creating Account...' : 'Create Account'}
-        </Button>
+          <BrutalButton
+            style={styles.registerButton}
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
+          </BrutalButton>
+        </BrutalCard>
 
-        <Text style={styles.loginText}>
-          Already have an account?{' '}
-          <Text 
-            style={styles.loginLink}
+        <View style={styles.loginContainer}>
+          <Text style={[brutalTextStyle.body, styles.loginText]}>
+            ALREADY HAVE AN ACCOUNT?
+          </Text>
+          <BrutalButton
+            style={styles.loginButton}
+            variant="outline"
             onPress={() => navigation.navigate('Login')}
           >
-            Sign In
-          </Text>
-        </Text>
+            SIGN IN
+          </BrutalButton>
+        </View>
       </View>
-    </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     justifyContent: 'center',
+    paddingTop: 40,
+    paddingBottom: 40,
   },
   title: {
     textAlign: 'center',
     marginBottom: 8,
-    fontWeight: 'bold',
+    color: NeoBrutalism.colors.black,
+    fontSize: 32,
+    fontWeight: '900',
+    textShadowColor: NeoBrutalism.colors.neonGreen,
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 0,
   },
   subtitle: {
     textAlign: 'center',
     marginBottom: 30,
-    opacity: 0.7,
+    color: NeoBrutalism.colors.black,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  formContainer: {
+    padding: 24,
+    marginBottom: 20,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   input: {
-    marginBottom: 16,
+    marginBottom: 18,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderWidth: 3,
+    borderColor: NeoBrutalism.colors.black,
+    borderRadius: 0,
+  },
+  inputText: {
+    color: NeoBrutalism.colors.black,
+    fontSize: 16,
+    fontWeight: '600',
   },
   checkbox: {
     marginVertical: 20,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderWidth: 3,
+    borderColor: NeoBrutalism.colors.black,
+    borderRadius: 0,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
   registerButton: {
-    marginBottom: 20,
+    marginTop: 10,
+  },
+  loginContainer: {
+    alignItems: 'center',
   },
   loginText: {
     textAlign: 'center',
+    color: NeoBrutalism.colors.black,
+    marginBottom: 15,
+    fontSize: 16,
+    fontWeight: '700',
   },
-  loginLink: {
-    color: '#6C5CE7',
-    fontWeight: 'bold',
+  loginButton: {
+    paddingHorizontal: 30,
   },
 });

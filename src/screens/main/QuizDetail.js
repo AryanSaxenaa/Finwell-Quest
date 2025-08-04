@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Layout, Text, TopNavigation, TopNavigationAction, Card, Button } from '@ui-kitten/components';
+import { View, StyleSheet, ScrollView, Alert, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  BrutalHeader,
+  brutalTextStyle 
+} from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const BackIcon = (props) => <Ionicons name="arrow-back" size={24} color="black" />;
 
@@ -134,63 +140,66 @@ export default function QuizDetail({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <Layout style={styles.container}>
-        <TopNavigation
-          title={topicData.title}
-          accessoryLeft={renderBackAction}
-          style={styles.topNavigation}
+      <View style={styles.container}>
+        <BrutalHeader
+          title={`📖 ${topicData.title.toUpperCase()}`}
+          textColor="white"
+          leftAction={
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color={NeoBrutalism.colors.white} />
+            </TouchableOpacity>
+          }
         />
       
       <ScrollView style={styles.content}>
         {currentStep === 'content' && (
-          <Card style={styles.contentCard}>
-            <Text category='h6' style={styles.sectionTitle}>Learning Content</Text>
+          <BrutalCard style={styles.contentCard}>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.sectionTitle]}>📚 LEARNING CONTENT</Text>
             {topicData.content.map((point, index) => (
               <View key={index} style={styles.contentPoint}>
-                <Text style={styles.bulletPoint}>•</Text>
-                <Text category='p1' style={styles.contentText}>{point}</Text>
+                <Text style={brutalTextStyle('body', 'bold', 'black')}>•</Text>
+                <Text style={[brutalTextStyle('body', 'medium', 'black'), styles.contentText]}>{point.toUpperCase()}</Text>
               </View>
             ))}
-            <Button 
+            <BrutalButton 
+              title="🚀 START QUIZ"
               style={styles.startQuizButton}
               onPress={handleStartQuiz}
-            >
-              Start Quiz
-            </Button>
-          </Card>
+            />
+          </BrutalCard>
         )}
 
         {currentStep === 'quiz' && (
-          <Card style={styles.quizCard}>
-            <Text category='h6' style={styles.sectionTitle}>Quiz Question</Text>
-            <Text category='p1' style={styles.questionText}>
-              {topicData.quiz.question}
+          <BrutalCard style={styles.quizCard}>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.sectionTitle]}>🧠 QUIZ QUESTION</Text>
+            <Text style={[brutalTextStyle('body', 'medium', 'black'), styles.questionText]}>
+              {topicData.quiz.question.toUpperCase()}
             </Text>
             
             <View style={styles.optionsContainer}>
               {topicData.quiz.options.map((option, index) => (
-                <Button
+                <TouchableOpacity
                   key={index}
                   style={[
                     styles.optionButton,
                     selectedAnswer === index && styles.selectedOption
                   ]}
-                  appearance={selectedAnswer === index ? 'filled' : 'outline'}
                   onPress={() => handleAnswerSelect(index)}
                 >
-                  {option}
-                </Button>
+                  <Text style={brutalTextStyle('body', 'medium', 'black')}>
+                    {option.toUpperCase()}
+                  </Text>
+                </TouchableOpacity>
               ))}
             </View>
 
-            <Button 
+            <BrutalButton 
+              title="💥 SUBMIT ANSWER"
               style={styles.submitButton}
               disabled={selectedAnswer === null}
               onPress={handleSubmitAnswer}
-            >
-              Submit Answer
-            </Button>
-          </Card>
+            />
+          </BrutalCard>
         )}
 
         {currentStep === 'completed' && (
@@ -211,7 +220,7 @@ export default function QuizDetail({ navigation, route }) {
           </Card>
         )}
       </ScrollView>
-    </Layout>
+    </View>
     </SafeAreaView>
   );
 }
@@ -219,15 +228,11 @@ export default function QuizDetail({ navigation, route }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  topNavigation: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 8,
+    backgroundColor: NeoBrutalism.colors.white,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
@@ -235,19 +240,18 @@ const styles = StyleSheet.create({
   },
   contentCard: {
     marginBottom: 16,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   quizCard: {
     marginBottom: 16,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   completedCard: {
     marginBottom: 16,
-    backgroundColor: '#E8F5E8',
-    borderColor: '#4CAF50',
-    borderWidth: 1,
+    backgroundColor: NeoBrutalism.colors.neonGreen,
   },
   sectionTitle: {
     marginBottom: 16,
-    fontWeight: 'bold',
     textAlign: 'center',
   },
   contentPoint: {
@@ -255,40 +259,39 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingRight: 16,
   },
-  bulletPoint: {
-    marginRight: 8,
-    fontWeight: 'bold',
-    color: '#007AFF',
-  },
   contentText: {
     flex: 1,
     lineHeight: 20,
+    marginLeft: 8,
   },
   startQuizButton: {
     marginTop: 20,
   },
   questionText: {
     marginBottom: 20,
-    fontSize: 16,
-    lineHeight: 24,
     textAlign: 'center',
+    lineHeight: 24,
   },
   optionsContainer: {
     marginBottom: 20,
+    gap: 8,
   },
   optionButton: {
-    marginBottom: 10,
+    padding: 16,
+    borderWidth: 3,
+    borderColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.white,
   },
   selectedOption: {
-    backgroundColor: '#007AFF',
+    backgroundColor: NeoBrutalism.colors.neonYellow,
+    borderWidth: 4,
   },
   submitButton: {
-    marginTop: 10,
+    marginTop: 16,
   },
   completedTitle: {
     textAlign: 'center',
     marginBottom: 16,
-    color: '#4CAF50',
   },
   completedText: {
     textAlign: 'center',
@@ -296,8 +299,6 @@ const styles = StyleSheet.create({
   },
   tokenEarned: {
     textAlign: 'center',
-    fontWeight: 'bold',
-    color: '#FFD700',
     marginBottom: 20,
   },
   backToLearningButton: {

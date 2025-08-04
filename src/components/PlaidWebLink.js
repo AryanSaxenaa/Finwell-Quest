@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Modal, View, StyleSheet, Alert } from 'react-native';
+import { Modal, View, StyleSheet, Alert, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { Button, Text } from '@ui-kitten/components';
+import { BrutalButton, BrutalCard, brutalTextStyle } from './BrutalComponents';
+import { NeoBrutalism } from '../styles/neoBrutalism';
 
 export default function PlaidWebLink({ linkToken, onSuccess, onExit, visible, onClose }) {
   const [webViewKey, setWebViewKey] = useState(0);
@@ -18,77 +19,96 @@ export default function PlaidWebLink({ linkToken, onSuccess, onExit, visible, on
         body {
             margin: 0;
             padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F0F0F0;
+            font-weight: 700;
         }
         .container {
             max-width: 400px;
             margin: 20px auto;
             text-align: center;
+            background: #FFFFFF;
+            border: 4px solid #000000;
+            padding: 24px;
         }
         .button {
-            background: #00d4aa;
-            color: white;
-            border: none;
+            background: #FFFF00;
+            color: #000000;
+            border: 3px solid #000000;
             padding: 15px 30px;
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 800;
             cursor: pointer;
             width: 100%;
             margin: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .button:hover {
-            background: #00c29a;
+            background: #FFFF66;
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px #000000;
         }
         .button:disabled {
-            background: #ccc;
+            background: #CCCCCC;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         .close-button {
-            background: #6c757d;
+            background: #FF006B;
+            color: #FFFFFF;
         }
         .close-button:hover {
-            background: #5a6268;
+            background: #FF3388;
         }
         .title {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 800;
             margin-bottom: 10px;
-            color: #2d3748;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .subtitle {
             font-size: 16px;
-            color: #718096;
+            color: #666666;
             margin-bottom: 30px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
         .status {
             font-size: 14px;
             margin: 10px 0;
-            color: #4a5568;
+            color: #000000;
+            font-weight: 600;
+            text-transform: uppercase;
         }
         .error {
-            color: #e53e3e;
-            background: #fed7d7;
-            padding: 10px;
-            border-radius: 6px;
+            color: #000000;
+            background: #FF006B;
+            padding: 15px;
+            border: 3px solid #000000;
             margin: 10px 0;
+            font-weight: 700;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="title">Connect Your Bank Account</div>
-        <div class="subtitle">Securely connect your bank account to track expenses</div>
+        <div class="title">CONNECT YOUR BANK</div>
+        <div class="subtitle">SECURELY LINK YOUR ACCOUNT TO TRACK EXPENSES</div>
         
-        <div id="status" class="status">Loading Plaid...</div>
+        <div id="status" class="status">LOADING PLAID...</div>
         
         <button id="link-button" class="button" disabled>
-            Initializing...
+            INITIALIZING...
         </button>
         
         <button id="close-button" class="button close-button">
-            Cancel
+            CANCEL
         </button>
         
         <div id="error-message" class="error" style="display: none;"></div>
@@ -337,24 +357,23 @@ export default function PlaidWebLink({ linkToken, onSuccess, onExit, visible, on
       presentationStyle="pageSheet"
     >
       <View style={styles.container}>
-        <View style={styles.header}>
+        <BrutalCard style={styles.header}>
           <View style={styles.headerTop}>
-            <Text category="h6" style={styles.headerTitle}>
-              Connect Bank Account
+            <Text style={brutalTextStyle('h6', 'bold', 'black')}>
+              🏦 CONNECT BANK ACCOUNT
             </Text>
-            <Button
+            <BrutalButton
+              title="✕ CLOSE"
               size="small"
-              appearance="ghost"
+              variant="secondary"
               onPress={onClose}
               style={styles.closeButton}
-            >
-              Close
-            </Button>
+            />
           </View>
-          <Text category="c1" style={styles.statusText}>
-            {status}
+          <Text style={[brutalTextStyle('caption', 'medium', 'black'), styles.statusText]}>
+            {status.toUpperCase()}
           </Text>
-        </View>
+        </BrutalCard>
         
         <WebView
           key={webViewKey}
@@ -369,16 +388,15 @@ export default function PlaidWebLink({ linkToken, onSuccess, onExit, visible, on
           bounces={false}
         />
         
-        <View style={styles.footer}>
-          <Button
+        <BrutalCard style={styles.footer}>
+          <BrutalButton
+            title="🔄 REFRESH"
             size="small"
-            appearance="outline"
+            variant="secondary"
             onPress={refreshWebView}
             style={styles.refreshButton}
-          >
-            Refresh
-          </Button>
-        </View>
+          />
+        </BrutalCard>
       </View>
     </Modal>
   );
@@ -387,41 +405,39 @@ export default function PlaidWebLink({ linkToken, onSuccess, onExit, visible, on
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   header: {
     flexDirection: 'column',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    padding: NeoBrutalism.spacing.lg,
+    borderBottomWidth: NeoBrutalism.borders.thick,
+    borderBottomColor: NeoBrutalism.colors.black,
     paddingTop: 50, // Account for status bar
+    backgroundColor: NeoBrutalism.colors.neonYellow,
   },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    marginBottom: 4,
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
+    marginBottom: NeoBrutalism.spacing.xs,
   },
   statusText: {
     textAlign: 'center',
-    color: '#666',
-    fontSize: 12,
+    marginTop: NeoBrutalism.spacing.xs,
+    color: NeoBrutalism.colors.black,
   },
   closeButton: {
-    minWidth: 60,
+    minWidth: 80,
   },
   webView: {
     flex: 1,
   },
   footer: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
+    padding: NeoBrutalism.spacing.lg,
+    borderTopWidth: NeoBrutalism.borders.thick,
+    borderTopColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   refreshButton: {
     alignSelf: 'center',

@@ -4,6 +4,7 @@ import { BottomNavigation, BottomNavigationTab } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { NeoBrutalism } from '../styles/neoBrutalism';
 import HomeStackNavigator from './HomeStackNavigator';
 import GameStackNavigator from './GameStackNavigator';
 import LearnStackNavigator from './LearnStackNavigator';
@@ -11,10 +12,10 @@ import AIStackNavigator from './AIStackNavigator';
 
 const Tab = createBottomTabNavigator();
 
-const HomeIcon = (props) => <Ionicons name="home-outline" size={24} color={props.tintColor} />;
-const GameIcon = (props) => <Ionicons name="grid-outline" size={24} color={props.tintColor} />;
-const LearnIcon = (props) => <Ionicons name="book-outline" size={24} color={props.tintColor} />;
-const AIIcon = (props) => <Ionicons name="chatbubble-ellipses-outline" size={24} color={props.tintColor} />;
+const HomeIcon = (props) => <Ionicons name="home" size={24} color={NeoBrutalism.colors.white} />;
+const GameIcon = (props) => <Ionicons name="game-controller" size={24} color={NeoBrutalism.colors.white} />;
+const LearnIcon = (props) => <Ionicons name="library" size={24} color={NeoBrutalism.colors.white} />;
+const AIIcon = (props) => <Ionicons name="chatbubbles" size={24} color={NeoBrutalism.colors.white} />;
 
 const BottomTabBar = ({ navigation, state }) => (
   <SafeAreaView edges={['bottom']} style={styles.safeAreaBottom}>
@@ -24,22 +25,18 @@ const BottomTabBar = ({ navigation, state }) => (
       style={styles.bottomNavigation}
     >
       <BottomNavigationTab 
-        title='Home' 
         icon={HomeIcon} 
         style={styles.bottomTab}
       />
       <BottomNavigationTab 
-        title='Game' 
         icon={GameIcon} 
         style={styles.bottomTab}
       />
       <BottomNavigationTab 
-        title='Learn' 
         icon={LearnIcon} 
         style={styles.bottomTab}
       />
       <BottomNavigationTab 
-        title='AI Advisor' 
         icon={AIIcon} 
         style={styles.bottomTab}
       />
@@ -63,15 +60,18 @@ export default function MainTabNavigator() {
 
 const styles = StyleSheet.create({
   safeAreaBottom: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: NeoBrutalism.colors.darkBlue,
   },
   bottomNavigation: {
-    paddingVertical: 8,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    paddingVertical: 12,
+    backgroundColor: NeoBrutalism.colors.darkBlue,
+    borderTopWidth: 4,
+    borderTopColor: NeoBrutalism.colors.black,
+    elevation: 0,
+    shadowOpacity: 0,
   },
   bottomTab: {
-    paddingVertical: 4,
+    paddingVertical: 6,
+    backgroundColor: 'transparent',
   },
 });

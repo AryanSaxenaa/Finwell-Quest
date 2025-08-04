@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
-import { 
-  Layout, 
-  Text, 
-  Button, 
-  Card,
-  TopNavigation,
-  TopNavigationAction,
-  Radio,
-  RadioGroup 
-} from '@ui-kitten/components';
+import { View, StyleSheet, Animated, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 import { getRandomQuestion } from '../../utils/questions';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  BrutalHeader,
+  brutalTextStyle 
+} from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const BackIcon = (props) => <Ionicons name="arrow-back" size={24} color="black" />;
 
@@ -107,24 +104,28 @@ export default function QuestionScreen({ navigation, route }) {
   if (showResult) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <Layout style={styles.container}>
-          <TopNavigation
-            title='Result'
-            accessoryLeft={renderBackAction}
-            style={styles.topNavigation}
+        <View style={styles.container}>
+          <BrutalHeader
+            title='🏆 RESULT'
+            textColor="white"
+            leftAction={
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={24} color={NeoBrutalism.colors.white} />
+              </TouchableOpacity>
+            }
           />
         <View style={styles.resultContainer}>
           <Animated.View style={[
             styles.resultCard, 
             { 
-              backgroundColor: isCorrect ? '#E8F5E8' : '#FDE8E8',
+              backgroundColor: isCorrect ? NeoBrutalism.colors.neonGreen : NeoBrutalism.colors.hotPink,
               transform: [{ scale: scaleValue }, { translateY: slideValue.interpolate({
                 inputRange: [0, 1],
                 outputRange: [50, 0]
               })}]
             }
           ]}>
-            <Card style={styles.resultCardInner}>
+            <BrutalCard style={styles.resultCardInner}>
               {/* Success/Failure Icon with Animation */}
               <Animated.View style={[
                 styles.resultIconContainer,
@@ -133,41 +134,41 @@ export default function QuestionScreen({ navigation, route }) {
                 <Ionicons 
                   name={isCorrect ? 'checkmark-circle' : 'close-circle'} 
                   size={80}
-                  color={isCorrect ? '#00B894' : '#E74C3C'}
+                  color={NeoBrutalism.colors.black}
                 />
               </Animated.View>
               
-              <Text category='h4' style={[
-                styles.resultText,
-                { color: isCorrect ? '#00B894' : '#E74C3C' }
+              <Text style={[
+                brutalTextStyle('h4', 'bold', 'black'),
+                styles.resultText
               ]}>
-                {isCorrect ? '🎉 Correct!' : '❌ Incorrect'}
+                {isCorrect ? '🎉 CORRECT!' : '❌ INCORRECT'}
               </Text>
               
               {/* Show correct answer if user was wrong */}
               {!isCorrect && (
-                <View style={styles.correctAnswerContainer}>
-                  <Text category='s1' style={styles.correctAnswerLabel}>
-                    Correct Answer:
+                <BrutalCard style={styles.correctAnswerContainer}>
+                  <Text style={[brutalTextStyle('body', 'bold', 'black'), styles.correctAnswerLabel]}>
+                    CORRECT ANSWER:
                   </Text>
-                  <Text category='h6' style={styles.correctAnswerText}>
+                  <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.correctAnswerText]}>
                     {question?.options[question?.correctAnswer]}
                   </Text>
-                </View>
+                </BrutalCard>
               )}
               
-              <Text category='p1' style={styles.explanation}>
+              <Text style={[brutalTextStyle('body', 'medium', 'black'), styles.explanation]}>
                 {question?.explanation}
               </Text>
               
               {isCorrect && (
                 <View style={styles.pointsContainer}>
-                  <Text category='h5' style={styles.pointsEarned}>
+                  <Text style={[brutalTextStyle('h5', 'bold', 'black'), styles.pointsEarned]}>
                     +{question?.points} XP!
                   </Text>
                   {question?.difficulty === 'hard' && (
-                    <Text category='s1' style={styles.bonusText}>
-                      🌟 Hard Question Bonus!
+                    <Text style={[brutalTextStyle('body', 'bold', 'black'), styles.bonusText]}>
+                      🌟 HARD QUESTION BONUS!
                     </Text>
                   )}
                 </View>
@@ -179,10 +180,10 @@ export default function QuestionScreen({ navigation, route }) {
                   <Text style={styles.confetti}>🎊🎉✨🎊🎉✨</Text>
                 </View>
               )}
-            </Card>
+            </BrutalCard>
           </Animated.View>
         </View>
-      </Layout>
+      </View>
       </SafeAreaView>
     );
   }
@@ -190,103 +191,123 @@ export default function QuestionScreen({ navigation, route }) {
   if (!question) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <Layout style={styles.container}>
-          <TopNavigation
-            title='Loading...'
-            accessoryLeft={renderBackAction}
-            style={styles.topNavigation}
+        <View style={styles.container}>
+          <BrutalHeader
+            title='⏳ LOADING...'
+            textColor="white"
+            leftAction={
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={24} color={NeoBrutalism.colors.white} />
+              </TouchableOpacity>
+            }
           />
           <View style={styles.content}>
-            <Text>Loading question...</Text>
+            <BrutalCard style={styles.loadingCard}>
+              <Text style={brutalTextStyle('h6', 'bold', 'black')}>
+                🎲 LOADING QUESTION...
+              </Text>
+            </BrutalCard>
           </View>
-        </Layout>
+        </View>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <Layout style={styles.container}>
-        <TopNavigation
-          title='Question'
-          accessoryLeft={renderBackAction}
-          style={styles.topNavigation}
+      <View style={styles.container}>
+        <BrutalHeader
+          title='🧠 QUIZ CHALLENGE'
+          textColor="white"
+          leftAction={
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color={NeoBrutalism.colors.white} />
+            </TouchableOpacity>
+          }
         />
       
       <View style={styles.content}>
-        <Card style={styles.progressCard}>
+        <BrutalCard style={styles.progressCard}>
           <View style={styles.progressHeader}>
-            <Text category='c1'>Question 1 of 5</Text>
+            <Text style={brutalTextStyle('caption', 'bold', 'black')}>QUESTION 1 OF 5</Text>
             <View style={styles.difficultyBadge}>
               <Text style={[
+                brutalTextStyle('caption', 'bold', 'white'),
                 styles.difficultyText,
                 { backgroundColor: 
-                  question.difficulty === 'easy' ? '#00B894' :
-                  question.difficulty === 'medium' ? '#F39C12' : '#E74C3C'
+                  question.difficulty === 'easy' ? NeoBrutalism.colors.neonGreen :
+                  question.difficulty === 'medium' ? NeoBrutalism.colors.brightOrange : NeoBrutalism.colors.pureRed
                 }
               ]}>
-                {question.difficulty.toUpperCase()} • {question.points} XP
+                {question.difficulty ? question.difficulty.toUpperCase() : 'UNKNOWN'} • {question.points || 0} XP
               </Text>
             </View>
           </View>
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: '20%' }]} />
           </View>
-        </Card>
+        </BrutalCard>
 
         <Animated.View style={[
           styles.questionCard,
           { transform: [{ scale: scaleValue }] }
         ]}>
-          <Card style={styles.questionCardInner}>
+          <BrutalCard style={styles.questionCardInner}>
             <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>
-                📊 {question.category.charAt(0).toUpperCase() + question.category.slice(1)}
+              <Text style={brutalTextStyle('caption', 'bold', 'black')}>
+                📊 {question.category ? question.category.charAt(0).toUpperCase() + question.category.slice(1) : 'Unknown'}
               </Text>
             </View>
             
-            <Text category='h6' style={styles.questionText}>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.questionText]}>
               {question.question}
             </Text>
             
-            <RadioGroup
-              selectedIndex={selectedIndex}
-              onChange={setSelectedIndex}
-              style={styles.optionsContainer}
-            >
+            <View style={styles.optionsContainer}>
               {question.options.map((option, index) => (
-                <Radio 
+                <TouchableOpacity 
                   key={index} 
                   style={[
                     styles.option,
                     selectedIndex === index && styles.selectedOption
                   ]}
+                  onPress={() => setSelectedIndex(index)}
                 >
-                  {option}
-                </Radio>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioButton,
+                      selectedIndex === index && styles.radioSelected
+                    ]}>
+                      {selectedIndex === index && <Text style={styles.radioCheck}>✓</Text>}
+                    </View>
+                    <Text style={brutalTextStyle('body', 'medium', 'black')}>
+                      {option}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               ))}
-            </RadioGroup>
-          </Card>
+            </View>
+          </BrutalCard>
         </Animated.View>
 
         <View style={styles.buttonContainer}>
-          <Button
-            style={styles.button}
-            appearance='outline'
+          <BrutalButton
+            title="SKIP"
+            variant="outline"
+            style={styles.skipButton}
             onPress={handleSkip}
-          >
-            Skip Question
-          </Button>
-          <Button
-            style={[styles.button, styles.submitButton]}
+            icon={<Ionicons name="arrow-forward" size={18} color={NeoBrutalism.colors.black} />}
+          />
+          <BrutalButton
+            title="SUBMIT"
+            style={styles.submitButton}
             onPress={handleAnswer}
             disabled={selectedIndex === null}
-          >
-            Submit Answer
-          </Button>
+            icon={<Ionicons name="checkmark" size={18} color={NeoBrutalism.colors.white} />}
+          />
         </View>
       </View>
-    </Layout>
+    </View>
     </SafeAreaView>
   );
 }
@@ -294,15 +315,11 @@ export default function QuestionScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  topNavigation: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 8,
+    backgroundColor: NeoBrutalism.colors.white,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
@@ -310,6 +327,7 @@ const styles = StyleSheet.create({
   },
   progressCard: {
     marginBottom: 16,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   progressHeader: {
     flexDirection: 'row',
@@ -318,78 +336,101 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   difficultyBadge: {
-    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: NeoBrutalism.colors.black,
     overflow: 'hidden',
   },
   difficultyText: {
-    color: 'white',
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: '900',
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   progressBar: {
-    height: 8,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 4,
+    height: 12,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderWidth: 2,
+    borderColor: NeoBrutalism.colors.black,
     marginTop: 8,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#6C5CE7',
-    borderRadius: 4,
+    backgroundColor: NeoBrutalism.colors.electricBlue,
   },
   questionCard: {
     flex: 1,
     marginBottom: 16,
   },
   questionCardInner: {
-    padding: 0,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderWidth: 0, // Removed black border
   },
   categoryBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#F0F0FF',
-    borderRadius: 20,
+    backgroundColor: NeoBrutalism.colors.neonGreen,
+    borderWidth: 0, // Removed black border
     paddingHorizontal: 12,
     paddingVertical: 6,
     marginBottom: 16,
   },
-  categoryText: {
-    color: '#6C5CE7',
-    fontSize: 12,
-    fontWeight: '600',
-  },
   questionText: {
     marginBottom: 20,
     lineHeight: 26,
-    fontSize: 18,
-    fontWeight: '600',
   },
   optionsContainer: {
     marginTop: 16,
   },
   option: {
-    marginBottom: 16,
-    backgroundColor: '#FAFAFA',
-    borderRadius: 12,
-    padding: 4,
+    marginBottom: 12,
+    backgroundColor: NeoBrutalism.colors.lightGray,
+    borderWidth: 0, // Removed black border
+    padding: 16,
+    borderRadius: 8, // Added border radius for better appearance
   },
   selectedOption: {
-    backgroundColor: '#E8F5E8',
-    borderColor: '#00B894',
-    borderWidth: 2,
+    backgroundColor: NeoBrutalism.colors.neonYellow,
+    borderWidth: 0, // Removed black border
+    borderRadius: 8, // Added border radius for better appearance
+  },
+  radioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderWidth: 0, // Removed black border
+    backgroundColor: NeoBrutalism.colors.white,
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10, // Made circular
+  },
+  radioSelected: {
+    backgroundColor: NeoBrutalism.colors.electricBlue,
+  },
+  radioCheck: {
+    color: NeoBrutalism.colors.white,
+    fontSize: 12,
+    fontWeight: '900',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 16,
+    paddingHorizontal: 8,
   },
-  button: {
-    flex: 1,
-    marginHorizontal: 8,
+  skipButton: {
+    flex: 0.4,
+    minHeight: 50,
+    borderWidth: 3,
+    borderColor: NeoBrutalism.colors.black,
   },
   submitButton: {
-    backgroundColor: '#6C5CE7',
+    flex: 0.6,
+    minHeight: 50,
   },
+  // Result screen styles
   resultContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -398,56 +439,50 @@ const styles = StyleSheet.create({
   },
   resultCard: {
     width: '100%',
-    borderRadius: 20,
+    borderWidth: 4,
+    borderColor: NeoBrutalism.colors.black,
     padding: 8,
   },
   resultCardInner: {
     padding: 32,
     alignItems: 'center',
-    backgroundColor: 'transparent',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   resultIconContainer: {
     marginBottom: 20,
   },
   resultText: {
     marginBottom: 20,
-    fontWeight: 'bold',
-    fontSize: 24,
+    textAlign: 'center',
   },
   correctAnswerContainer: {
-    backgroundColor: '#FFF3E0',
-    borderRadius: 12,
+    backgroundColor: NeoBrutalism.colors.lightGray,
+    borderWidth: 2,
+    borderColor: NeoBrutalism.colors.black,
     padding: 16,
     marginBottom: 20,
     width: '100%',
   },
   correctAnswerLabel: {
-    color: '#F57C00',
-    fontWeight: 'bold',
     marginBottom: 8,
   },
   correctAnswerText: {
-    color: '#E65100',
-    fontSize: 16,
+    textAlign: 'center',
   },
   explanation: {
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 24,
-    fontSize: 16,
   },
   pointsContainer: {
     alignItems: 'center',
   },
   pointsEarned: {
-    color: '#00B894',
-    fontWeight: 'bold',
-    fontSize: 20,
+    textAlign: 'center',
   },
   bonusText: {
-    color: '#FFD700',
-    fontWeight: 'bold',
     marginTop: 8,
+    textAlign: 'center',
   },
   confettiContainer: {
     position: 'absolute',
@@ -458,6 +493,12 @@ const styles = StyleSheet.create({
   },
   confetti: {
     fontSize: 24,
-    letterSpacing: 4,
+  },
+  // Loading styles
+  loadingCard: {
+    padding: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
   },
 });

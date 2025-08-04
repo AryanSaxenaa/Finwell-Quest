@@ -1,14 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, TextInput } from 'react-native';
 import Modal from 'react-native-modal';
-import { Layout, Text, Button, Input } from '@ui-kitten/components';
 import { useExpenseStore } from '../store/index.js';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  BrutalHeader,
+  brutalTextStyle 
+} from './BrutalComponents';
+import { NeoBrutalism } from '../styles/neoBrutalism';
 
 export default function AddExpenseModal({ visible, onClose }) {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [showAmountInput, setShowAmountInput] = useState(false);
+  const [showDescriptionInput, setShowDescriptionInput] = useState(false);
+  const [tempAmount, setTempAmount] = useState('');
+  const [tempDescription, setTempDescription] = useState('');
   const [date, setDate] = useState(new Date().toLocaleDateString());
   const { categories, addExpense } = useExpenseStore();
 
@@ -19,6 +29,10 @@ export default function AddExpenseModal({ visible, onClose }) {
       setDescription('');
       setSelectedCategoryIndex(null);
       setShowCategoryPicker(false);
+      setShowAmountInput(false);
+      setShowDescriptionInput(false);
+      setTempAmount('');
+      setTempDescription('');
       setDate(new Date().toLocaleDateString());
     }
   }, [visible]);
@@ -26,6 +40,18 @@ export default function AddExpenseModal({ visible, onClose }) {
   const handleCategorySelect = (index) => {
     setSelectedCategoryIndex(index);
     setShowCategoryPicker(false);
+  };
+
+  const handleAmountSave = () => {
+    setAmount(tempAmount);
+    setShowAmountInput(false);
+    setTempAmount('');
+  };
+
+  const handleDescriptionSave = () => {
+    setDescription(tempDescription);
+    setShowDescriptionInput(false);
+    setTempDescription('');
   };
 
   const handleSave = () => {
@@ -50,77 +76,87 @@ export default function AddExpenseModal({ visible, onClose }) {
       onBackButtonPress={onClose}
       style={{ margin: 0, justifyContent: 'center' }}
     >
-      <Layout style={styles.container}>
-          <View style={styles.header}>
-            <Text category='h5'>Add Expense</Text>
-            <Button
-              appearance='ghost'
+      <View style={styles.container}>
+          <BrutalCard style={styles.header}>
+            <Text style={brutalTextStyle('h5', 'bold', 'white')}>💰 ADD EXPENSE</Text>
+            <BrutalButton
+              title="✕"
+              variant="secondary"
               onPress={onClose}
               style={styles.closeButton}
-            >
-              ✕
-            </Button>
-          </View>
+            />
+          </BrutalCard>
 
           <View style={styles.form}>
-            <Input
-              style={styles.input}
-              placeholder='0.00'
-              label='Amount ($)'
-              value={amount}
-              onChangeText={setAmount}
-              keyboardType='decimal-pad'
-              returnKeyType="next"
-            />
-
-            <View style={styles.input}>
-              <Text category='label' style={styles.label}>Category</Text>
-              <TouchableOpacity
-                style={styles.categoryButton}
-                onPress={() => setShowCategoryPicker(true)}
+            <View style={styles.inputContainer}>
+              <Text style={brutalTextStyle('body', 'bold', 'black')}>AMOUNT ($)</Text>
+              <TouchableOpacity 
+                style={styles.brutaInput} 
+                onPress={() => {
+                  setTempAmount(amount);
+                  setShowAmountInput(true);
+                }}
               >
-                <Text style={styles.categoryButtonText}>
-                  {selectedCategoryIndex !== null 
-                    ? categories[selectedCategoryIndex] 
-                    : 'Select Category'}
+                <Text style={[brutalTextStyle('body', 'medium', 'black'), styles.inputText, !amount && styles.placeholderText]}>
+                  {amount || '0.00'}
                 </Text>
               </TouchableOpacity>
             </View>
 
-            <Input
-              style={styles.input}
-              placeholder='Description (optional)'
-              value={description}
-              onChangeText={setDescription}
-              multiline={true}
-              numberOfLines={3}
-            />
+            <View style={styles.inputContainer}>
+              <Text style={brutalTextStyle('body', 'bold', 'black')}>CATEGORY</Text>
+              <TouchableOpacity
+                style={styles.categoryButton}
+                onPress={() => setShowCategoryPicker(true)}
+              >
+                <Text style={brutalTextStyle('body', 'medium', 'black')}>
+                  {selectedCategoryIndex !== null 
+                    ? categories[selectedCategoryIndex].toUpperCase()
+                    : 'SELECT CATEGORY'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-            <Input
-              style={styles.input}
-              placeholder='Date'
-              value={date}
-              disabled
-            />
+            <View style={styles.inputContainer}>
+              <Text style={brutalTextStyle('body', 'bold', 'black')}>DESCRIPTION</Text>
+              <TouchableOpacity 
+                style={styles.brutaInput} 
+                onPress={() => {
+                  setTempDescription(description);
+                  setShowDescriptionInput(true);
+                }}
+              >
+                <Text style={[brutalTextStyle('body', 'medium', 'black'), styles.inputText, !description && styles.placeholderText]}>
+                  {description || 'DESCRIPTION (OPTIONAL)'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={brutalTextStyle('body', 'bold', 'black')}>DATE</Text>
+              <View style={styles.brutaInput}>
+                <Text style={brutalTextStyle('body', 'medium', 'black')}>
+                  {date}
+                </Text>
+              </View>
+            </View>
           </View>
 
           <View style={styles.buttonContainer}>
-            <Button
+            <BrutalButton
+              title="CANCEL"
+              variant="outline"
               style={styles.button}
-              appearance='outline'
               onPress={onClose}
-            >
-              Cancel
-            </Button>
-            <Button
+            />
+            <BrutalButton
+              title="💾 SAVE"
               style={styles.button}
               onPress={handleSave}
               disabled={!amount || selectedCategoryIndex === null}
-            >
-              Save
-            </Button>
+            />
           </View>
-        </Layout>
+        </View>
 
         {/* Category Picker Modal */}
         <Modal
@@ -129,18 +165,86 @@ export default function AddExpenseModal({ visible, onClose }) {
           onBackButtonPress={() => setShowCategoryPicker(false)}
           style={styles.categoryModal}
         >
-          <Layout style={styles.categoryContainer}>
-            <Text category='h6' style={styles.categoryTitle}>Select Category</Text>
-            {categories.map((category, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.categoryOption}
-                onPress={() => handleCategorySelect(index)}
-              >
-                <Text style={styles.categoryOptionText}>{category}</Text>
-              </TouchableOpacity>
-            ))}
-          </Layout>
+          <BrutalCard style={styles.categoryContainer}>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.categoryTitle]}>📊 SELECT CATEGORY</Text>
+            <View style={styles.categoryScrollContainer}>
+              {categories.map((category, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.categoryOption}
+                  onPress={() => handleCategorySelect(index)}
+                >
+                  <Text style={brutalTextStyle('body', 'medium', 'black')}>{category.toUpperCase()}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </BrutalCard>
+        </Modal>
+
+        {/* Amount Input Modal */}
+        <Modal
+          isVisible={showAmountInput}
+          onBackdropPress={() => setShowAmountInput(false)}
+          onBackButtonPress={() => setShowAmountInput(false)}
+          style={styles.inputModal}
+        >
+          <BrutalCard style={styles.inputContainer}>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.inputTitle]}>💰 ENTER AMOUNT</Text>
+            <TextInput
+              style={styles.textInput}
+              value={tempAmount}
+              onChangeText={setTempAmount}
+              placeholder="0.00"
+              keyboardType="numeric"
+              autoFocus
+            />
+            <View style={styles.inputButtonContainer}>
+              <BrutalButton
+                title="CANCEL"
+                variant="outline"
+                style={styles.inputButton}
+                onPress={() => setShowAmountInput(false)}
+              />
+              <BrutalButton
+                title="SAVE"
+                style={styles.inputButton}
+                onPress={handleAmountSave}
+              />
+            </View>
+          </BrutalCard>
+        </Modal>
+
+        {/* Description Input Modal */}
+        <Modal
+          isVisible={showDescriptionInput}
+          onBackdropPress={() => setShowDescriptionInput(false)}
+          onBackButtonPress={() => setShowDescriptionInput(false)}
+          style={styles.inputModal}
+        >
+          <BrutalCard style={styles.inputContainer}>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.inputTitle]}>📝 ENTER DESCRIPTION</Text>
+            <TextInput
+              style={styles.textInput}
+              value={tempDescription}
+              onChangeText={setTempDescription}
+              placeholder="Description (optional)"
+              multiline
+              autoFocus
+            />
+            <View style={styles.inputButtonContainer}>
+              <BrutalButton
+                title="CANCEL"
+                variant="outline"
+                style={styles.inputButton}
+                onPress={() => setShowDescriptionInput(false)}
+              />
+              <BrutalButton
+                title="SAVE"
+                style={styles.inputButton}
+                onPress={handleDescriptionSave}
+              />
+            </View>
+          </BrutalCard>
         </Modal>
     </Modal>
   );
@@ -149,78 +253,115 @@ export default function AddExpenseModal({ visible, onClose }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: NeoBrutalism.colors.white,
+    margin: 20,
+    borderWidth: 4,
+    borderColor: NeoBrutalism.colors.black,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E4E9F2',
+    paddingVertical: 16,
+    backgroundColor: NeoBrutalism.colors.darkBlue,
+    borderBottomWidth: 4,
+    borderBottomColor: NeoBrutalism.colors.black,
   },
   closeButton: {
-    paddingHorizontal: 0,
+    minWidth: 40,
   },
   form: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
   },
-  input: {
-    marginBottom: 16,
+  inputContainer: {
+    marginBottom: 20,
   },
-  label: {
-    marginBottom: 8,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#8F9BB3',
+  brutaInput: {
+    borderWidth: 3,
+    borderColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.white,
+    padding: 16,
+    marginTop: 8,
+    minHeight: 50,
+    justifyContent: 'center',
+  },
+  inputText: {
+    minHeight: 20,
+  },
+  placeholderText: {
+    opacity: 0.6,
   },
   categoryButton: {
-    borderWidth: 1,
-    borderColor: '#E4E9F2',
-    borderRadius: 4,
+    borderWidth: 3,
+    borderColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.lightGray,
     padding: 16,
-    backgroundColor: '#FFFFFF',
-  },
-  categoryButtonText: {
-    fontSize: 16,
-    color: '#222B45',
+    marginTop: 8,
+    minHeight: 50,
+    justifyContent: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingBottom: 40,
-    paddingTop: 20,
+    paddingBottom: 20,
+    paddingTop: 16,
+    gap: 12,
   },
   button: {
     flex: 1,
-    marginHorizontal: 8,
   },
   categoryModal: {
     justifyContent: 'center',
     margin: 20,
   },
   categoryContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderWidth: 4,
+    borderColor: NeoBrutalism.colors.black,
     padding: 20,
-    maxHeight: 400,
+    maxHeight: '70%', // Limit height to prevent overflow
   },
   categoryTitle: {
     marginBottom: 16,
     textAlign: 'center',
   },
-  categoryOption: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E4E9F2',
+  categoryScrollContainer: {
+    maxHeight: 300, // Scrollable area for categories
   },
-  categoryOptionText: {
+  categoryOption: {
+    padding: 12, // Reduced padding for better fit
+    borderWidth: 2,
+    borderColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.lightGray,
+    marginBottom: 6, // Reduced margin
+  },
+  inputModal: {
+    justifyContent: 'center',
+    margin: 20,
+  },
+  inputTitle: {
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  textInput: {
+    borderWidth: 3,
+    borderColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.white,
+    padding: 16,
+    marginBottom: 20,
     fontSize: 16,
-    color: '#222B45',
+    fontWeight: '600',
+    minHeight: 50,
+  },
+  inputButtonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  inputButton: {
+    flex: 1,
   },
 });

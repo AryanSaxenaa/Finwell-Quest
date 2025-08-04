@@ -21,7 +21,6 @@ import {
   BrutalButton, 
   BrutalCard, 
   BrutalStats, 
-  BrutalStat,
   BrutalIllustration, 
   BrutalHeader,
   BrutalProgressBar 
@@ -50,14 +49,14 @@ export default function HomeDashboard({ navigation }) {
   
   // Color palette for expense categories
   const colors = [
-    NeoBrutalism.colors.neonYellow,    // Housing
-    NeoBrutalism.colors.hotPink,       // Transport  
-    NeoBrutalism.colors.electricBlue,  // Food
-    NeoBrutalism.colors.neonGreen,     // Entertainment (fixed from brightGreen)
-    NeoBrutalism.colors.deepPurple,    // Shopping (changed from duplicate hotPink)
-    '#FFB84D', // Orange - Bills
-    '#FF6B6B', // Red - Other
-    '#4ECDC4', // Teal - Additional
+    NeoBrutalism.colors.neonYellow,
+    NeoBrutalism.colors.hotPink,
+    NeoBrutalism.colors.electricBlue,
+    NeoBrutalism.colors.brightGreen,
+    NeoBrutalism.colors.hotPink,
+    '#FFB84D', // Orange
+    '#FF6B6B', // Red
+    '#4ECDC4', // Teal
   ];
 
   // Prepare data for chart
@@ -65,21 +64,24 @@ export default function HomeDashboard({ navigation }) {
   const totalAmount = displayData.reduce((sum, item) => sum + item.total, 0);
   
   const pieChartData = displayData.map((item, index) => ({
-    name: item.category || 'Unknown',
+    name: item.category,
     population: item.total,
     color: colors[index % colors.length],
     legendFontColor: NeoBrutalism.colors.black,
     legendFontSize: 12,
-    amount: item.total,
-    category: item.category || 'Unknown'
+    amount: item.total
   }));
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safeArea}>
       <Layout style={styles.container}>
         <BrutalHeader 
-          title="💰 FINPATH QUEST"
-          textColor="white"
+          title="FINPATH QUEST"
+          leftAction={
+            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+              <Ionicons name="menu" size={24} color={NeoBrutalism.colors.black} />
+            </TouchableOpacity>
+          }
           rightAction={
             <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
               <View style={styles.profileButton}>
@@ -101,7 +103,7 @@ export default function HomeDashboard({ navigation }) {
               </Text>
             </View>
             
-            <BrutalStat
+            <BrutalStats
               label="TOTAL SPENT"
               value={`$${totalAmount.toLocaleString()}`}
               color="hotPink"
@@ -114,8 +116,8 @@ export default function HomeDashboard({ navigation }) {
               <View style={styles.chartWrapper}>
                 <PieChart
                   data={pieChartData}
-                  width={180}
-                  height={180}
+                  width={240}
+                  height={240}
                   chartConfig={{
                     backgroundGradientFrom: NeoBrutalism.colors.white,
                     backgroundGradientTo: NeoBrutalism.colors.white,
@@ -124,12 +126,23 @@ export default function HomeDashboard({ navigation }) {
                   }}
                   accessor="population"
                   backgroundColor="transparent"
-                  paddingLeft="45"
+                  paddingLeft="60"
                   center={[0, 0]}
                   absolute={false}
                   hasLegend={false}
                   avoidFalseZero={true}
                 />
+                <View style={styles.brutalChartCenter}>
+                  <Text style={brutalTextStyle('caption', 'bold', 'black')}>
+                    TOTAL
+                  </Text>
+                  <Text style={[
+                    brutalTextStyle('h3', 'bold', 'black'),
+                    styles.brutalTotalAmount
+                  ]}>
+                    ${totalAmount.toLocaleString()}
+                  </Text>
+                </View>
               </View>
             </View>
           ) : (
@@ -157,13 +170,17 @@ export default function HomeDashboard({ navigation }) {
                   <Text style={brutalTextStyle('h6', 'bold', 'black')}>
                     CONNECT YOUR BANK
                   </Text>
+                  <Text style={brutalTextStyle('caption', 'medium', 'gray')}>
+                    Get automatic expense tracking and personalized insights
+                  </Text>
                 </View>
-            <BrutalButton
-              title="CONNECT"
-              onPress={() => navigation.navigate('BankConnection')}
-              variant="primary"
-              size="small"
-            />
+                <BrutalButton
+                  onPress={() => navigation.navigate('BankConnection')}
+                  variant="primary"
+                  size="small"
+                >
+                  CONNECT
+                </BrutalButton>
               </View>
             </BrutalCard>
           ) : spendingInsights && (
@@ -172,26 +189,21 @@ export default function HomeDashboard({ navigation }) {
                 THIS WEEK'S INSIGHTS
               </Text>
               <View style={styles.insightsGrid}>
-                <BrutalStat
-                  label="WEEKLY"
-                  value={`$${(spendingInsights?.weeklySpent || 0).toFixed(0)}`}
-                  subtitle="SPENT"
+                <BrutalStats
+                  label="WEEKLY SPENDING"
+                  value={`$${spendingInsights.weeklySpent.toFixed(2)}`}
                   color="hotPink"
-                  style={styles.insightStat}
                 />
-                <BrutalStat
-                  label="TOP"
-                  value={spendingInsights?.topSpendingCategory?.slice(0, 6) || 'N/A'}
-                  subtitle={`$${(spendingInsights?.topSpendingAmount || 0).toFixed(0)}`}
+                <BrutalStats
+                  label="TOP CATEGORY"
+                  value={spendingInsights.topSpendingCategory}
+                  subtitle={`$${spendingInsights.topSpendingAmount.toFixed(2)}`}
                   color="electricBlue"
-                  style={styles.insightStat}
                 />
-                <BrutalStat
-                  label="DAILY"
-                  value={`$${(spendingInsights?.averageDailySpending || 0).toFixed(0)}`}
-                  subtitle="AVG"
+                <BrutalStats
+                  label="DAILY AVERAGE"
+                  value={`$${spendingInsights.averageDailySpending.toFixed(2)}`}
                   color="neonYellow"
-                  style={styles.insightStat}
                 />
               </View>
             </BrutalCard>
@@ -206,22 +218,13 @@ export default function HomeDashboard({ navigation }) {
               <View style={styles.legendGrid}>
                 {displayData.map((item, index) => (
                   <View key={index} style={styles.brutalLegendItem}>
-                    <View style={[styles.brutalLegendDot, { backgroundColor: colors[index % colors.length] }]} />
-                    <View style={styles.legendTextContainer}>
-                      <Text 
-                        style={brutalTextStyle('caption', 'bold', 'black')}
-                        numberOfLines={1}
-                        adjustsFontSizeToFit={true}
-                      >
-                        {item.category ? item.category.toUpperCase() : 'UNKNOWN'}
-                      </Text>
-                      <Text 
-                        style={brutalTextStyle('caption', 'bold', 'gray')}
-                        numberOfLines={1}
-                      >
-                        ${item.total.toLocaleString()}
-                      </Text>
-                    </View>
+                    <View style={[styles.brutalLegendDot, { backgroundColor: item.color }]} />
+                    <Text style={brutalTextStyle('caption', 'bold', 'black')}>
+                      {item.name.toUpperCase()}
+                    </Text>
+                    <Text style={brutalTextStyle('caption', 'bold', 'gray')}>
+                      ${item.population.toLocaleString()}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -231,20 +234,22 @@ export default function HomeDashboard({ navigation }) {
           {/* Action Buttons */}
           <View style={styles.actionButtonsContainer}>
             <BrutalButton
-              title="ADD EXPENSE"
               onPress={() => setShowAddExpense(true)}
               variant="primary"
               style={styles.addExpenseButton}
-              icon={<Ionicons name="add" size={20} color={NeoBrutalism.colors.black} />}
-            />
+            >
+              <Ionicons name="add" size={20} color={NeoBrutalism.colors.black} />
+              ADD EXPENSE
+            </BrutalButton>
 
             <BrutalButton
-              title="VIEW HISTORY"
               onPress={() => navigation.navigate('ExpenseHistory')}
               variant="secondary"
               style={styles.viewHistoryButton}
-              icon={<Ionicons name="list" size={20} color={NeoBrutalism.colors.black} />}
-            />
+            >
+              <Ionicons name="list" size={20} color={NeoBrutalism.colors.black} />
+              VIEW HISTORY
+            </BrutalButton>
           </View>
 
         {/* Budget Overview Section */}
@@ -260,62 +265,22 @@ export default function HomeDashboard({ navigation }) {
 
           <View style={styles.budgetCardsContainer}>
             {budgetSummary.length > 0 ? (
-              budgetSummary.map((budget, index) => {
-                const progress = ((budget.spent || 0) / (budget.limit || 1)) * 100; // Convert to percentage
-                const isOverspent = progress > 100;
-                const isNearLimit = progress > 80;
-                const isTemplate = (budget.spent || 0) === 0; // Check if this is a template budget
-                
-                return (
-                  <View key={budget.id || index} style={[
-                    styles.brutalBudgetCard,
-                    isOverspent && styles.overspentBudgetCard,
-                    isTemplate && styles.templateBudgetCard
-                  ]}>
-                    <View style={styles.budgetCardHeader}>
-                      <View style={styles.budgetCategoryRow}>
-                        <Text style={brutalTextStyle('h6', 'bold', 'black')}>
-                          {budget.category ? budget.category.toUpperCase() : 'UNKNOWN CATEGORY'}
-                        </Text>
-                        {isTemplate && (
-                          <View style={styles.templateBadge}>
-                            <Text style={styles.templateIcon}>📋</Text>
-                          </View>
-                        )}
-                        {isOverspent && !isTemplate && (
-                          <View style={styles.overspentAlert}>
-                            <Text style={styles.alertIcon}>⚠️</Text>
-                          </View>
-                        )}
-                      </View>
-                      <Text style={brutalTextStyle('caption', 'bold', 'gray')}>
-                        {isTemplate ? `BUDGET: $${budget.limit || 0}` : `$${budget.spent || 0} / $${budget.limit || 0}`}
-                      </Text>
-                    </View>
-                    <BrutalProgressBar
-                      progress={isTemplate ? 0 : Math.min(progress, 100)}
-                      color={isOverspent ? 'hotPink' : isNearLimit ? 'neonYellow' : 'electricBlue'}
-                      fillColor={isOverspent ? 'hotPink' : isNearLimit ? 'neonYellow' : 'electricBlue'}
-                      style={isOverspent ? styles.overspentProgressBar : {}}
-                    />
-                    {isTemplate ? (
-                      <Text style={[
-                        brutalTextStyle('caption', 'medium', 'gray'),
-                        styles.templateText
-                      ]}>
-                        START TRACKING TO SEE PROGRESS
-                      </Text>
-                    ) : isOverspent && (
-                      <Text style={[
-                        brutalTextStyle('caption', 'bold', 'black'),
-                        styles.overspentText
-                      ]}>
-                        OVER BY ${((budget.spent || 0) - (budget.limit || 0)).toFixed(0)}
-                      </Text>
-                    )}
+              budgetSummary.map((budget, index) => (
+                <View key={budget.id || index} style={styles.brutalBudgetCard}>
+                  <View style={styles.budgetCardHeader}>
+                    <Text style={brutalTextStyle('h6', 'bold', 'black')}>
+                      {budget.category.toUpperCase()}
+                    </Text>
+                    <Text style={brutalTextStyle('caption', 'bold', 'gray')}>
+                      ${budget.spent} / ${budget.limit}
+                    </Text>
                   </View>
-                );
-              })
+                  <BrutalProgressBar
+                    progress={budget.spent / budget.limit}
+                    color={budget.spent > budget.limit ? 'hotPink' : budget.spent > budget.limit * 0.8 ? 'neonYellow' : 'electricBlue'}
+                  />
+                </View>
+              ))
             ) : (
               <View style={styles.emptyBudgetState}>
                 <BrutalIllustration
@@ -334,12 +299,13 @@ export default function HomeDashboard({ navigation }) {
           </View>
 
           <BrutalButton
-            title="MANAGE BUDGETS"
             onPress={() => navigation.navigate('BudgetManagement')}
             variant="secondary"
             style={styles.addBudgetButton}
-            icon={<Ionicons name="add-circle" size={20} color={NeoBrutalism.colors.black} />}
-          />
+          >
+            <Ionicons name="add-circle" size={20} color={NeoBrutalism.colors.black} />
+            MANAGE BUDGETS
+          </BrutalButton>
         </BrutalCard>
       </ScrollView>
 
@@ -385,7 +351,7 @@ const styles = StyleSheet.create({
   
   // Overview Card
   overviewCard: {
-    marginBottom: NeoBrutalism.spacing.xl, // Increased from md to xl for more space
+    marginBottom: NeoBrutalism.spacing.lg,
   },
   overviewHeader: {
     flexDirection: 'row',
@@ -397,7 +363,7 @@ const styles = StyleSheet.create({
   // Chart Styles
   brutalChartSection: {
     alignItems: 'center',
-    marginVertical: NeoBrutalism.spacing.lg, // Increased from sm to lg for more space
+    marginVertical: NeoBrutalism.spacing.md,
   },
   chartWrapper: {
     position: 'relative',
@@ -407,7 +373,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     left: '50%',
-    transform: [{ translateX: -30 }, { translateY: -15 }], // Adjusted for smaller chart
+    transform: [{ translateX: -40 }, { translateY: -20 }],
     alignItems: 'center',
   },
   brutalTotalAmount: {
@@ -445,29 +411,23 @@ const styles = StyleSheet.create({
   
   // Insights
   insightsCard: {
-    marginTop: NeoBrutalism.spacing.xs, // Reduced from sm to xs
-    marginBottom: NeoBrutalism.spacing.lg, // Increased from sm to lg
+    marginVertical: NeoBrutalism.spacing.md,
   },
   insightsTitle: {
-    marginBottom: NeoBrutalism.spacing.sm, // Reduced from md to sm
+    marginBottom: NeoBrutalism.spacing.md,
   },
   insightsGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     flexWrap: 'wrap',
-  },
-  insightStat: {
-    flex: 1,
-    marginHorizontal: NeoBrutalism.spacing.xs,
-    minHeight: 80,
+    justifyContent: 'space-between',
   },
   
   // Legend
   categoryLegend: {
-    marginVertical: NeoBrutalism.spacing.sm, // Reduced from md to sm
+    marginVertical: NeoBrutalism.spacing.md,
   },
   legendTitle: {
-    marginBottom: NeoBrutalism.spacing.sm, // Reduced from md to sm
+    marginBottom: NeoBrutalism.spacing.md,
   },
   legendGrid: {
     flexDirection: 'row',
@@ -479,19 +439,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '48%',
     marginBottom: NeoBrutalism.spacing.sm,
-    paddingRight: NeoBrutalism.spacing.xs,
   },
   brutalLegendDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
     marginRight: NeoBrutalism.spacing.sm,
-    borderWidth: 0, // Removed black border
-    flexShrink: 0,
-  },
-  legendTextContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: NeoBrutalism.colors.black,
   },
   
   // Action Buttons
@@ -525,64 +480,15 @@ const styles = StyleSheet.create({
   brutalBudgetCard: {
     padding: NeoBrutalism.spacing.md,
     backgroundColor: NeoBrutalism.colors.lightGray,
-    borderWidth: 0, // Removed black border
+    borderWidth: NeoBrutalism.borders.thick,
+    borderColor: NeoBrutalism.colors.black,
     marginBottom: NeoBrutalism.spacing.sm,
-  },
-  overspentBudgetCard: {
-    backgroundColor: '#FFE5E5',
-    borderColor: NeoBrutalism.colors.hotPink,
-    opacity: 0.9,
   },
   budgetCardHeader: {
-    marginBottom: NeoBrutalism.spacing.sm,
-  },
-  budgetCategoryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: NeoBrutalism.spacing.xs,
-  },
-  overspentAlert: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: NeoBrutalism.colors.hotPink,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 0, // Removed black border
-  },
-  alertIcon: {
-    fontSize: 12,
-  },
-  overspentProgressBar: {
-    opacity: 0.8,
-  },
-  overspentText: {
-    textAlign: 'center',
-    marginTop: NeoBrutalism.spacing.xs,
-    color: NeoBrutalism.colors.hotPink,
-  },
-  
-  // Template Budget Styles
-  templateBudgetCard: {
-    borderColor: NeoBrutalism.colors.gray,
-    backgroundColor: NeoBrutalism.colors.lightGray,
-    opacity: 0.9,
-  },
-  templateBadge: {
-    backgroundColor: NeoBrutalism.colors.neonYellow,
-    borderRadius: 12,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    marginLeft: NeoBrutalism.spacing.xs,
-  },
-  templateIcon: {
-    fontSize: 12,
-  },
-  templateText: {
-    textAlign: 'center',
-    marginTop: NeoBrutalism.spacing.xs,
-    fontStyle: 'italic',
+    marginBottom: NeoBrutalism.spacing.sm,
   },
   
   // Empty Budget State

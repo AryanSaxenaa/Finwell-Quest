@@ -4,15 +4,16 @@ import {
   Layout, 
   TopNavigation, 
   TopNavigationAction, 
-  Card, 
-  Text, 
-  Button,
-  Divider
+  Text,
+  Card,
+  Button
 } from '@ui-kitten/components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 import { QUESTIONS_DATABASE } from '../../utils/questions';
+import { BrutalCard, BrutalButton, brutalTextStyle } from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const BackIcon = (props) => (
   <Ionicons name="arrow-back" size={24} color="#2E384D" />
@@ -37,9 +38,9 @@ export default function DailyChallenge({ navigation }) {
           alignment='center'
         />
         <View style={styles.content}>
-          <Card>
+          <BrutalCard>
             <Text>Loading...</Text>
-          </Card>
+          </BrutalCard>
         </View>
       </Layout>
     );
@@ -158,7 +159,7 @@ export default function DailyChallenge({ navigation }) {
         />
         
         <View style={styles.content}>
-          <Card style={styles.completedCard}>
+          <BrutalCard style={styles.completedCard}>
             <View style={styles.completedHeader}>
               <TrophyIcon />
               <Text category='h4' style={styles.completedTitle}>
@@ -177,13 +178,13 @@ export default function DailyChallenge({ navigation }) {
               Next challenge available tomorrow
             </Text>
             
-            <Button
+            <BrutalButton
               style={styles.backButton}
               onPress={() => navigation.goBack()}
             >
               Back to Game Center
-            </Button>
-          </Card>
+            </BrutalButton>
+          </BrutalCard>
         </View>
       </Layout>
     );
@@ -199,9 +200,9 @@ export default function DailyChallenge({ navigation }) {
         />
         
         <View style={styles.content}>
-          <Card>
+          <BrutalCard>
             <Text>Loading today's challenge...</Text>
-          </Card>
+          </BrutalCard>
         </View>
       </Layout>
     );
@@ -218,28 +219,28 @@ export default function DailyChallenge({ navigation }) {
         />
       
       <View style={styles.content}>
-        <Card style={styles.challengeHeader}>
+        <BrutalCard style={styles.challengeHeader}>
           <View style={styles.headerContent}>
             <CalendarIcon />
-            <Text category='h5' style={styles.challengeTitle}>
-              Today's Financial Question
+            <Text style={[brutalTextStyle('h5', 'bold', 'black'), styles.challengeTitle]}>
+              TODAY'S FINANCIAL QUESTION
             </Text>
           </View>
-          <Text category='c1' style={styles.rewardText}>
-            Reward: 50 XP
+          <Text style={[brutalTextStyle('caption', 'bold', 'black'), styles.rewardText]}>
+            REWARD: 50 XP
           </Text>
-        </Card>
+        </BrutalCard>
 
-        <Card style={styles.questionCard}>
-          <Text category='h6' style={styles.questionText}>
-            {currentQuestion?.question || 'Loading question...'}
+        <BrutalCard style={styles.questionCard}>
+          <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.questionText]}>
+            {currentQuestion?.question || 'LOADING QUESTION...'}
           </Text>
           
-          <Divider style={styles.divider} />
+          <View style={styles.divider} />
           
           <View style={styles.optionsContainer}>
             {currentQuestion?.options?.map((option, index) => (
-              <Button
+              <BrutalButton
                 key={index}
                 style={[
                   styles.optionButton,
@@ -247,37 +248,37 @@ export default function DailyChallenge({ navigation }) {
                   showResult && index === currentQuestion?.correctAnswer && styles.correctOption,
                   showResult && selectedAnswer === index && index !== currentQuestion?.correctAnswer && styles.incorrectOption
                 ]}
-                appearance={selectedAnswer === index ? 'filled' : 'outline'}
+                variant={selectedAnswer === index ? 'primary' : 'outline'}
                 onPress={() => handleAnswerSelect(index)}
                 disabled={showResult}
               >
                 {option}
-              </Button>
+              </BrutalButton>
             )) || []}
           </View>
 
           {showResult && currentQuestion?.explanation && (
             <View style={styles.explanationContainer}>
-              <Divider style={styles.divider} />
-              <Text category='h6' style={styles.explanationTitle}>
-                Explanation:
+              <View style={styles.divider} />
+              <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.explanationTitle]}>
+                EXPLANATION:
               </Text>
-              <Text category='p2' style={styles.explanationText}>
+              <Text style={[brutalTextStyle('body', 'medium', 'black'), styles.explanationText]}>
                 {currentQuestion.explanation}
               </Text>
             </View>
           )}
 
           {!showResult && (
-            <Button
+            <BrutalButton
               style={styles.submitButton}
               onPress={handleSubmitAnswer}
               disabled={selectedAnswer === null}
             >
-              Submit Answer
-            </Button>
+              SUBMIT ANSWER
+            </BrutalButton>
           )}
-        </Card>
+        </BrutalCard>
       </View>
     </Layout>
     </SafeAreaView>
@@ -287,15 +288,15 @@ export default function DailyChallenge({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   topNavigation: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: NeoBrutalism.colors.white,
     paddingVertical: 8,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
@@ -303,7 +304,8 @@ const styles = StyleSheet.create({
   },
   challengeHeader: {
     marginBottom: 16,
-    backgroundColor: '#FFD700',
+    backgroundColor: NeoBrutalism.colors.neonYellow,
+    borderWidth: 0,
   },
   headerContent: {
     flexDirection: 'row',
@@ -312,15 +314,17 @@ const styles = StyleSheet.create({
   },
   challengeTitle: {
     marginLeft: 12,
-    color: '#2E384D',
+    color: NeoBrutalism.colors.black,
     fontWeight: 'bold',
   },
   rewardText: {
-    color: '#2E384D',
+    color: NeoBrutalism.colors.black,
     fontWeight: 'bold',
   },
   questionCard: {
     flex: 1,
+    borderWidth: 0,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   questionText: {
     marginBottom: 20,
@@ -328,6 +332,8 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginVertical: 16,
+    height: 3,
+    backgroundColor: NeoBrutalism.colors.black,
   },
   optionsContainer: {
     marginBottom: 20,
@@ -337,16 +343,16 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   selectedOption: {
-    backgroundColor: '#6C5CE7',
-    borderColor: '#6C5CE7',
+    backgroundColor: NeoBrutalism.colors.neonBlue,
+    borderColor: NeoBrutalism.colors.black,
   },
   correctOption: {
-    backgroundColor: '#00D68F',
-    borderColor: '#00D68F',
+    backgroundColor: NeoBrutalism.colors.neonGreen,
+    borderColor: NeoBrutalism.colors.black,
   },
   incorrectOption: {
-    backgroundColor: '#FF3D71',
-    borderColor: '#FF3D71',
+    backgroundColor: NeoBrutalism.colors.hotPink,
+    borderColor: NeoBrutalism.colors.black,
   },
   submitButton: {
     marginTop: 10,
@@ -356,7 +362,7 @@ const styles = StyleSheet.create({
   },
   explanationTitle: {
     marginBottom: 8,
-    color: '#6C5CE7',
+    color: NeoBrutalism.colors.black,
   },
   explanationText: {
     lineHeight: 20,

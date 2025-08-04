@@ -1,22 +1,26 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { 
   Layout, 
-  Text, 
-  Card, 
-  Button, 
-  TopNavigation
+  Text
 } from '@ui-kitten/components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  BrutalHeader,
+  BrutalStats,
+  BrutalProgressBar,
+  brutalTextStyle 
+} from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
-const TrophyIcon = (props) => <Ionicons name="trophy-outline" size={32} color="#FFD700" />;
-const PlayIcon = (props) => <Ionicons name="play-circle-outline" size={24} color="white" />;
-const StarIcon = (props) => <Ionicons name="star-outline" size={32} color="#FFD700" />;
-const CalendarIcon = (props) => <Ionicons name="calendar-outline" size={24} color="#FFD700" />;
-const FlashIcon = (props) => <Ionicons name="flash-outline" size={32} color="#00B894" />;
-const HeartIcon = (props) => <Ionicons name="heart-outline" size={32} color="#E74C3C" />;
+const TrophyIcon = (props) => <Ionicons name="trophy" size={32} color={NeoBrutalism.colors.neonYellow} />;
+const StarIcon = (props) => <Ionicons name="star" size={32} color={NeoBrutalism.colors.neonYellow} />;
+const FlashIcon = (props) => <Ionicons name="flash" size={32} color={NeoBrutalism.colors.neonGreen} />;
+const HeartIcon = (props) => <Ionicons name="heart" size={32} color={NeoBrutalism.colors.hotPink} />;
 
 export default function GameHome({ navigation }) {
   const { 
@@ -47,91 +51,87 @@ export default function GameHome({ navigation }) {
   const progressPercentage = (xpProgress / 100) * 100;
 
   const StatCard = ({ title, value, icon }) => (
-    <Card style={styles.statCard}>
+    <BrutalCard style={styles.statCard}>
       <View style={styles.statContent}>
         {icon}
         <View style={styles.statText}>
-          <Text category='h5'>{value}</Text>
-          <Text category='c1'>{title}</Text>
+          <Text style={brutalTextStyle('h5', 'bold', 'black')}>{value}</Text>
+          <Text style={brutalTextStyle('caption', 'medium', 'gray')}>{title}</Text>
         </View>
       </View>
-    </Card>
+    </BrutalCard>
   );
 
   const DailyChallengeCard = () => (
-    <Card style={styles.challengeCard}>
+    <BrutalCard style={styles.challengeCard}>
       <View style={styles.challengeHeader}>
-        <Ionicons name="calendar" size={20} color="#D4AF37" style={styles.challengeIcon} />
-        <Text category='h6' style={styles.challengeTitle}>Daily Challenge</Text>
+        <Ionicons name="calendar" size={20} color={NeoBrutalism.colors.black} style={styles.challengeIcon} />
+        <Text style={brutalTextStyle('h6', 'bold', 'black')}>DAILY CHALLENGE</Text>
         {dailyChallenge.completed && (
-          <Ionicons name="checkmark-circle" size={20} color="#00D68F" style={{ marginLeft: 8 }} />
+          <Ionicons name="checkmark-circle" size={20} color={NeoBrutalism.colors.neonGreen} style={{ marginLeft: 8 }} />
         )}
       </View>
-      <Text category='p2' style={styles.challengeText}>
+      <Text style={[brutalTextStyle('body', 'medium', 'black'), styles.challengeText]}>
         {dailyChallenge.completed 
           ? dailyChallenge.wasCorrect 
-            ? `Completed! You earned ${dailyChallenge.xpEarned} XP!`
-            : 'Completed! Come back tomorrow for a new challenge.'
-          : 'Complete today\'s challenge for +50 XP!'
+            ? `COMPLETED! YOU EARNED ${dailyChallenge.xpEarned} XP!`
+            : 'COMPLETED! COME BACK TOMORROW FOR A NEW CHALLENGE.'
+          : 'COMPLETE TODAY\'S CHALLENGE FOR +50 XP!'
         }
       </Text>
       {!dailyChallenge.completed && (
-        <Button
-          style={styles.challengeButton}
-          size='small'
+        <BrutalButton
+          title="VIEW CHALLENGE"
           onPress={() => navigation.navigate('DailyChallenge')}
-        >
-          View Challenge
-        </Button>
+          variant="primary"
+          size="small"
+        />
       )}
-    </Card>
+    </BrutalCard>
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <Layout style={styles.container}>
-        <TopNavigation
-          title='Game Center'
-          alignment='center'
-          style={styles.topNavigation}
+        <BrutalHeader 
+          title="GAME CENTER"
         />
       
-      {/* Top Section with Level Progress and Leaderboard */}
-      <View style={styles.topSection}>
-        <Button
-          style={styles.compactLevelButton}
-          appearance='ghost'
-          accessoryLeft={() => <Ionicons name="trophy" size={20} color="#FFD700" />}
-        >
-          Level {level} • {xpProgress} XP
-        </Button>
+        {/* Top Section with Level Progress and Leaderboard */}
+        <View style={styles.topSection}>
+          <BrutalButton
+            title={`LEVEL ${level} • ${xpProgress} XP`}
+            variant="secondary"
+            size="small"
+            style={styles.compactLevelButton}
+            icon={<Ionicons name="trophy" size={20} color={NeoBrutalism.colors.black} />}
+          />
+          
+          <BrutalButton
+            title="LEADERBOARD"
+            variant="secondary"
+            size="small"
+            onPress={() => navigation.navigate('Leaderboard')}
+            style={styles.compactLeaderboardButton}
+            icon={<Ionicons name="podium" size={20} color={NeoBrutalism.colors.black} />}
+          />
+        </View>
         
-        <Button
-          style={styles.compactLeaderboardButton}
-          appearance='ghost'
-          onPress={() => navigation.navigate('Leaderboard')}
-          accessoryLeft={() => <Ionicons name="podium" size={20} color="#6C5CE7" />}
-        >
-          Leaderboard
-        </Button>
-      </View>
-      
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Card style={styles.playCard}>
-          <Text category='h4' style={styles.welcomeText}>Ready to Learn?</Text>
-          <Text category='p1' style={styles.descriptionText}>
-            Test your financial knowledge while having fun!
-          </Text>
-          <Button
-            style={styles.playButton}
-            size='large'
-            accessoryLeft={PlayIcon}
-            onPress={handleStartGame}
-            appearance='filled'
-          >
-            <Text style={styles.playButtonText}>Play Now</Text>
-          </Button>
-        </Card>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <BrutalCard style={styles.playCard}>
+            <Text style={brutalTextStyle('h4', 'bold', 'black')}>READY TO LEARN?</Text>
+            <Text style={[brutalTextStyle('body', 'medium', 'gray'), styles.descriptionText]}>
+              TEST YOUR FINANCIAL KNOWLEDGE WHILE HAVING FUN!
+            </Text>
+            <BrutalButton
+              title="PLAY NOW"
+              onPress={handleStartGame}
+              variant="primary"
+              size="large"
+              style={styles.playButton}
+              icon={<Ionicons name="play-circle" size={24} color={NeoBrutalism.colors.black} />}
+            />
+          </BrutalCard>
 
         <View style={styles.statsContainer}>
           <StatCard 
@@ -161,27 +161,27 @@ export default function GameHome({ navigation }) {
 
         <DailyChallengeCard />
 
-        <Card style={styles.achievementsCard}>
-          <Text category='h6' style={styles.achievementsTitle}>Game Statistics</Text>
+        <BrutalCard style={styles.achievementsCard}>
+          <Text style={brutalTextStyle('h6', 'bold', 'black')}>GAME STATISTICS</Text>
           <View style={styles.achievementsList}>
             <View style={styles.achievementItem}>
-              <Text category='s1'>Games Played</Text>
-              <Text category='h6'>{gameStats.totalGamesPlayed}</Text>
+              <Text style={brutalTextStyle('caption', 'medium', 'gray')}>GAMES PLAYED</Text>
+              <Text style={brutalTextStyle('h6', 'bold', 'black')}>{gameStats.totalGamesPlayed}</Text>
             </View>
             <View style={styles.achievementItem}>
-              <Text category='s1'>Accuracy</Text>
-              <Text category='h6'>
+              <Text style={brutalTextStyle('caption', 'medium', 'gray')}>ACCURACY</Text>
+              <Text style={brutalTextStyle('h6', 'bold', 'black')}>
                 {gameStats.totalQuestionsAnswered > 0 
                   ? Math.round((gameStats.totalCorrectAnswers / gameStats.totalQuestionsAnswered) * 100)
                   : 0}%
               </Text>
             </View>
             <View style={styles.achievementItem}>
-              <Text category='s1'>Best Streak</Text>
-              <Text category='h6'>{gameStats.streaks?.longestStreak || 0}</Text>
+              <Text style={brutalTextStyle('caption', 'medium', 'gray')}>BEST STREAK</Text>
+              <Text style={brutalTextStyle('h6', 'bold', 'black')}>{gameStats.streaks?.longestStreak || 0}</Text>
             </View>
           </View>
-        </Card>
+        </BrutalCard>
       </ScrollView>
     </Layout>
     </SafeAreaView>
@@ -191,27 +191,24 @@ export default function GameHome({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  topNavigation: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 8,
+    backgroundColor: NeoBrutalism.colors.white,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.background,
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: NeoBrutalism.spacing.lg,
   },
   topSection: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 4,
-    gap: 12,
+    marginTop: 20, // Added padding between header and buttons
+    marginBottom: NeoBrutalism.spacing.lg,
+    paddingHorizontal: NeoBrutalism.spacing.lg,
+    gap: NeoBrutalism.spacing.md,
   },
   levelProgressContainer: {
     flex: 1,
@@ -275,8 +272,12 @@ const styles = StyleSheet.create({
     borderColor: '#E4E9F2',
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 12,
+    paddingLeft: 2, // Further reduced left padding (was 8, now 2)
+    paddingRight: 20, // Increased right padding
     paddingVertical: 8,
+    minHeight: 44, // Ensure consistent height
+    justifyContent: 'center', // Center content vertically
+    alignItems: 'center', // Center content horizontally
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -291,8 +292,12 @@ const styles = StyleSheet.create({
     borderColor: '#E4E9F2',
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 12,
+    paddingLeft: 18, // Increased left padding (was 12, now 12 + 6 from level button reduction)
+    paddingRight: 17, // Reduced by 3px (was 20, now 17)
     paddingVertical: 8,
+    minHeight: 44, // Ensure consistent height
+    justifyContent: 'center', // Center content vertically
+    alignItems: 'center', // Center content horizontally
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -320,8 +325,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   playButton: {
-    backgroundColor: '#2E384D',
-    borderColor: '#2E384D',
+    backgroundColor: NeoBrutalism.colors.white, // Changed to white
+    borderColor: NeoBrutalism.colors.black, // Black border for contrast
+    borderWidth: 3, // Added border width
     borderRadius: 8,
   },
   playButtonText: {

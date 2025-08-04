@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, StyleSheet, Alert } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { Button, Text } from '@ui-kitten/components';
+import { Text } from '@ui-kitten/components';
+import { BrutalButton, BrutalCard, brutalTextStyle } from './BrutalComponents';
+import { NeoBrutalism } from '../styles/neoBrutalism';
 
 export default function PlaidSimpleLink({ linkToken, onSuccess, onExit, visible, onClose }) {
   const [status, setStatus] = useState('Ready to connect');
@@ -86,22 +88,21 @@ export default function PlaidSimpleLink({ linkToken, onSuccess, onExit, visible,
       onRequestClose={onClose}
     >
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text category="h6" style={styles.headerTitle}>
-            Connect Bank Account
+        <BrutalCard style={styles.header}>
+          <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.headerTitle]}>
+            CONNECT BANK ACCOUNT
           </Text>
-          <Text category="c1" style={styles.statusText}>
+          <Text style={[brutalTextStyle('caption', 'medium', 'black'), styles.statusText]}>
             {status}
           </Text>
-          <Button
-            size="small"
-            appearance="ghost"
+          <BrutalButton
+            variant="outline"
             onPress={onClose}
             style={styles.closeButton}
           >
-            Close
-          </Button>
-        </View>
+            CLOSE
+          </BrutalButton>
+        </BrutalCard>
         
         <WebView
           source={{ uri: hostedLinkUrl }}
@@ -118,27 +119,25 @@ export default function PlaidSimpleLink({ linkToken, onSuccess, onExit, visible,
           }}
         />
         
-        <View style={styles.footer}>
-          <Text category="c2" style={styles.helpText}>
+        <BrutalCard style={styles.footer}>
+          <Text style={[brutalTextStyle('caption', 'medium', 'black'), styles.helpText]}>
             {hasStarted 
-              ? "🔄 Your bank authentication is being processed automatically" 
-              : "👆 Select your bank above to start connecting"
+              ? "🔄 YOUR BANK AUTHENTICATION IS BEING PROCESSED AUTOMATICALLY" 
+              : "👆 SELECT YOUR BANK ABOVE TO START CONNECTING"
             }
           </Text>
           
-          <Button
-            size="medium"
-            appearance="filled"
+          <BrutalButton
             onPress={handleCompleteNow}
             style={styles.completeButton}
           >
-            {hasStarted ? "✅ Complete Connection Now" : "🚀 Skip to Demo Mode"}
-          </Button>
+            {hasStarted ? "✅ COMPLETE CONNECTION NOW" : "🚀 SKIP TO DEMO MODE"}
+          </BrutalButton>
           
-          <Text category="c2" style={styles.skipText}>
-            Click above to load demo transactions immediately
+          <Text style={[brutalTextStyle('caption', 'medium', 'black'), styles.skipText]}>
+            CLICK ABOVE TO LOAD DEMO TRANSACTIONS IMMEDIATELY
           </Text>
-        </View>
+        </BrutalCard>
       </View>
     </Modal>
   );
@@ -147,20 +146,22 @@ export default function PlaidSimpleLink({ linkToken, onSuccess, onExit, visible,
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   header: {
     padding: 16,
     paddingTop: 50,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    borderBottomWidth: 3,
+    borderBottomColor: NeoBrutalism.colors.black,
     alignItems: 'center',
+    backgroundColor: NeoBrutalism.colors.neonYellow,
   },
   headerTitle: {
     marginBottom: 8,
+    color: NeoBrutalism.colors.black,
   },
   statusText: {
-    color: '#666',
+    color: NeoBrutalism.colors.black,
     fontSize: 12,
     marginBottom: 8,
     textAlign: 'center',
@@ -175,13 +176,14 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
+    borderTopWidth: 3,
+    borderTopColor: NeoBrutalism.colors.black,
     alignItems: 'center',
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   helpText: {
     textAlign: 'center',
-    color: '#666',
+    color: NeoBrutalism.colors.black,
     marginBottom: 12,
   },
   completeButton: {
@@ -190,7 +192,7 @@ const styles = StyleSheet.create({
   },
   skipText: {
     textAlign: 'center',
-    color: '#999',
+    color: NeoBrutalism.colors.black,
     fontSize: 11,
   },
 });

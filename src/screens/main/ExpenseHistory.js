@@ -1,16 +1,16 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
-import { 
-  Layout, 
-  Text, 
-  ListItem, 
-  TopNavigation,
-  TopNavigationAction,
-  Card 
-} from '@ui-kitten/components';
+import { View, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BarChart } from 'react-native-chart-kit';
 import { useExpenseStore } from '../../store';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  BrutalHeader,
+  brutalTextStyle 
+} from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const { width } = Dimensions.get('window');
 
@@ -66,74 +66,92 @@ export default function ExpenseHistory({ navigation }) {
   };
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation
-        title='Expense History'
-        accessoryLeft={renderBackAction}
-      />
-      
-      <ScrollView style={styles.content}>
-        {chartData.length > 0 && (
-          <Card style={styles.chartCard}>
-            <Text category='h6' style={styles.chartTitle}>Monthly Spending Trends</Text>
-            <View style={styles.chartContainer}>
-              <BarChart
-                data={barChartData}
-                width={width - 60}
-                height={220}
-                chartConfig={chartConfig}
-                verticalLabelRotation={30}
-                showValuesOnTopOfBars={true}
-                fromZero={true}
-                style={{
-                  marginVertical: 8,
-                  borderRadius: 16
-                }}
-              />
-            </View>
-            <View style={styles.monthlyBreakdown}>
-              {chartData.map((item, index) => (
-                <View key={index} style={styles.monthItem}>
-                  <Text style={styles.monthLabel}>{item.month}</Text>
-                  <Text style={styles.monthAmount}>${item.amount.toFixed(2)}</Text>
-                </View>
-              ))}
-            </View>
-          </Card>
-        )}
-
-        <Card style={styles.listCard}>
-          <Text category='h6' style={styles.listTitle}>
-            Recent Transactions ({expenses.length})
-          </Text>
-          {expenses.length > 0 ? (
-            <View>
-              {expenses.slice().reverse().map((expense, index) => (
-                <ListItem
-                  key={expense.id || index}
-                  title={expense.description || expense.category}
-                  description={new Date(expense.date).toLocaleDateString()}
-                  accessoryRight={() => (
-                    <Text category='s1' style={{ color: '#E74C3C' }}>
-                      -${expense.amount.toFixed(2)}
-                    </Text>
-                  )}
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <View style={styles.container}>
+        <BrutalHeader
+          title='💳 EXPENSE HISTORY'
+          textColor="white"
+          leftAction={
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color={NeoBrutalism.colors.white} />
+            </TouchableOpacity>
+          }
+        />
+        
+        <ScrollView style={styles.content}>
+          {chartData.length > 0 && (
+            <BrutalCard style={styles.chartCard}>
+              <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.chartTitle]}>📊 MONTHLY SPENDING TRENDS</Text>
+              <View style={styles.chartContainer}>
+                <BarChart
+                  data={barChartData}
+                  width={width - 80}
+                  height={220}
+                  chartConfig={chartConfig}
+                  verticalLabelRotation={30}
+                  showValuesOnTopOfBars={true}
+                  fromZero={true}
+                  style={{
+                    marginVertical: 8,
+                  }}
                 />
-              ))}
-            </View>
-          ) : (
-            <Text style={styles.noData}>No expenses recorded yet</Text>
+              </View>
+              <View style={styles.monthlyBreakdown}>
+                {chartData.map((item, index) => (
+                  <BrutalCard key={index} style={styles.monthItem}>
+                    <Text style={brutalTextStyle('caption', 'bold', 'black')}>{item.month.toUpperCase()}</Text>
+                    <Text style={brutalTextStyle('body', 'bold', 'black')}>${item.amount.toFixed(2)}</Text>
+                  </BrutalCard>
+                ))}
+              </View>
+            </BrutalCard>
           )}
-        </Card>
-      </ScrollView>
-    </Layout>
+
+          <BrutalCard style={styles.listCard}>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.listTitle]}>
+              🧾 RECENT TRANSACTIONS ({expenses.length})
+            </Text>
+            {expenses.length > 0 ? (
+              <View>
+                {expenses.slice().reverse().map((expense, index) => (
+                  <BrutalCard
+                    key={expense.id || index}
+                    style={styles.expenseItem}
+                  >
+                    <View style={styles.expenseContent}>
+                      <View style={styles.expenseInfo}>
+                        <Text style={brutalTextStyle('body', 'bold', 'black')}>
+                          {(expense.description || expense.category).toUpperCase()}
+                        </Text>
+                        <Text style={brutalTextStyle('caption', 'medium', 'black')}>
+                          {new Date(expense.date).toLocaleDateString()}
+                        </Text>
+                      </View>
+                      <Text style={[brutalTextStyle('body', 'bold', 'black'), styles.expenseAmount]}>
+                        -${expense.amount.toFixed(2)}
+                      </Text>
+                    </View>
+                  </BrutalCard>
+                ))}
+              </View>
+            ) : (
+              <Text style={[brutalTextStyle('body', 'medium', 'black'), styles.noData]}>NO EXPENSES RECORDED YET</Text>
+            )}
+          </BrutalCard>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: NeoBrutalism.colors.white,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
@@ -141,47 +159,61 @@ const styles = StyleSheet.create({
   },
   chartCard: {
     marginBottom: 16,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   chartTitle: {
     marginBottom: 12,
-    fontWeight: 'bold',
+    textAlign: 'center',
   },
   chartContainer: {
     alignItems: 'center',
     marginVertical: 10,
+    borderWidth: 0, // Removed black border
+    backgroundColor: NeoBrutalism.colors.white,
+    padding: 8,
   },
   monthlyBreakdown: {
     marginTop: 16,
+    gap: 8,
   },
   monthItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#F8F9FA',
-    marginVertical: 2,
-    borderRadius: 8,
-    width: '100%',
-  },
-  monthLabel: {
-    fontSize: 14,
-    color: '#222B45',
-  },
-  monthAmount: {
-    fontWeight: 'bold',
-    color: '#6C5CE7',
+    backgroundColor: NeoBrutalism.colors.neonYellow,
+    borderWidth: 2,
+    borderColor: NeoBrutalism.colors.black,
   },
   listCard: {
     marginBottom: 16,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   listTitle: {
-    marginBottom: 12,
-    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  expenseItem: {
+    marginBottom: 8,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderWidth: 2,
+    borderColor: NeoBrutalism.colors.black,
+  },
+  expenseContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 8,
+  },
+  expenseInfo: {
+    flex: 1,
+  },
+  expenseAmount: {
+    color: NeoBrutalism.colors.pureRed,
   },
   noData: {
     textAlign: 'center',
+    marginTop: 20,
     fontStyle: 'italic',
-    opacity: 0.6,
-    padding: 20,
   },
 });

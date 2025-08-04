@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { 
   Layout, 
   Text, 
-  Input, 
-  Button,
-  Divider 
+  Input
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  brutalTextStyle 
+} from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const EyeIcon = (props) => <Ionicons name="eye-outline" size={24} color="#8F9BB3" />;
 const EyeOffIcon = (props) => <Ionicons name="eye-off-outline" size={24} color="#8F9BB3" />;
@@ -46,100 +51,139 @@ export default function LoginScreen({ navigation }) {
   );
 
   return (
-    <Layout style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text category='h2' style={styles.title}>Welcome Back!</Text>
-        <Text category='s1' style={styles.subtitle}>Sign in to continue your financial journey</Text>
+        <Text style={[brutalTextStyle.title, styles.title]}>WELCOME BACK!</Text>
+        <Text style={[brutalTextStyle.body, styles.subtitle]}>LOG IN TO DOMINATE YOUR FINANCES</Text>
 
-        <Input
-          style={styles.input}
-          placeholder='Email'
-          value={email}
-          onChangeText={setEmail}
-          keyboardType='email-address'
-          autoCapitalize='none'
-        />
+        <BrutalCard style={styles.formContainer}>
+          <Input
+            style={styles.input}
+            placeholder='EMAIL ADDRESS'
+            value={email}
+            onChangeText={setEmail}
+            keyboardType='email-address'
+            autoCapitalize='none'
+            textStyle={styles.inputText}
+          />
 
-        <Input
-          style={styles.input}
-          placeholder='Password'
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={secureTextEntry}
-          accessoryRight={renderIcon}
-          onTouchEnd={toggleSecureEntry}
-        />
+          <Input
+            style={styles.input}
+            placeholder='PASSWORD'
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={secureTextEntry}
+            accessoryRight={renderIcon}
+            onTouchEnd={toggleSecureEntry}
+            textStyle={styles.inputText}
+          />
 
-        <Button
-          style={styles.loginButton}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? 'Signing In...' : 'Sign In'}
-        </Button>
+          <BrutalButton
+            style={styles.loginButton}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? 'LOGGING IN...' : 'LOG IN'}
+          </BrutalButton>
 
-        <Button
-          style={styles.forgotButton}
-          appearance='ghost'
-          onPress={() => Alert.alert('Info', 'Forgot password functionality coming soon!')}
-        >
-          Forgot Password?
-        </Button>
+          <BrutalButton
+            style={styles.forgotButton}
+            variant="secondary"
+            onPress={() => Alert.alert('INFO', 'Forgot password functionality coming soon!')}
+          >
+            FORGOT PASSWORD?
+          </BrutalButton>
+        </BrutalCard>
 
-        <Divider style={styles.divider} />
+        <View style={styles.divider} />
 
-        <Text style={styles.registerText}>
-          Don't have an account?{' '}
-          <Text 
-            style={styles.registerLink}
+        <View style={styles.registerContainer}>
+          <Text style={[brutalTextStyle.body, styles.registerText]}>
+            DON'T HAVE AN ACCOUNT?
+          </Text>
+          <BrutalButton
+            style={styles.registerButton}
+            variant="outline"
             onPress={() => navigation.navigate('Register')}
           >
-            Sign Up
-          </Text>
-        </Text>
+            SIGN UP
+          </BrutalButton>
+        </View>
       </View>
-    </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     justifyContent: 'center',
+    paddingTop: 60,
+    paddingBottom: 40,
   },
   title: {
     textAlign: 'center',
     marginBottom: 8,
-    fontWeight: 'bold',
+    color: NeoBrutalism.colors.black,
+    fontSize: 32,
+    fontWeight: '900',
+    textShadowColor: NeoBrutalism.colors.neonYellow,
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 0,
   },
   subtitle: {
     textAlign: 'center',
     marginBottom: 40,
-    opacity: 0.7,
+    color: NeoBrutalism.colors.black,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  formContainer: {
+    padding: 24,
+    marginBottom: 30,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   input: {
-    marginBottom: 16,
+    marginBottom: 20,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderWidth: 3,
+    borderColor: NeoBrutalism.colors.black,
+    borderRadius: 0,
+  },
+  inputText: {
+    color: NeoBrutalism.colors.black,
+    fontSize: 16,
+    fontWeight: '600',
   },
   loginButton: {
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: 10,
+    marginBottom: 15,
   },
   forgotButton: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   divider: {
-    marginVertical: 20,
+    height: 3,
+    backgroundColor: NeoBrutalism.colors.neonPink,
+    marginVertical: 30,
+    borderRadius: 0,
+  },
+  registerContainer: {
+    alignItems: 'center',
   },
   registerText: {
     textAlign: 'center',
+    color: NeoBrutalism.colors.black,
+    marginBottom: 15,
+    fontSize: 16,
+    fontWeight: '700',
   },
-  registerLink: {
-    color: '#6C5CE7',
-    fontWeight: 'bold',
+  registerButton: {
+    paddingHorizontal: 30,
   },
 });

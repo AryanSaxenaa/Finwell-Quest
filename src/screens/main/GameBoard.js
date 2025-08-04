@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native';
+import { View, StyleSheet, Dimensions, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { 
   Layout, 
   Text, 
-  Button, 
-  Card,
-  TopNavigation,
-  TopNavigationAction,
   Modal
 } from '@ui-kitten/components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  BrutalHeader,
+  BrutalStats,
+  brutalTextStyle 
+} from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const { width } = Dimensions.get('window');
 const GRID_SIZE = 6;
@@ -137,11 +141,11 @@ export default function GameBoard({ navigation }) {
     const isPlayerHere = index === position;
     const getTileColor = () => {
       switch (tile.type) {
-        case 'question': return '#6C5CE7';
-        case 'bonus': return '#00B894';
-        case 'trap': return '#E74C3C';
-        case 'investment': return '#F39C12';
-        default: return '#DDD';
+        case 'question': return NeoBrutalism.colors.electricBlue;
+        case 'bonus': return NeoBrutalism.colors.neonGreen;
+        case 'trap': return NeoBrutalism.colors.hotPink;
+        case 'investment': return '#D97706'; // Changed from neonYellow to darker orange
+        default: return '#6B7280'; // Dark gray for better visibility
       }
     };
     
@@ -205,27 +209,25 @@ export default function GameBoard({ navigation }) {
             <Text category='p1' style={styles.gameOverScore}>Your final score: {score}</Text>
             
             <View style={styles.gameOverButtons}>
-              <Button
+              <BrutalButton
                 style={styles.restartButton}
-                size='large'
                 onPress={() => {
                   resetGame();
                   navigation.replace('GameBoard');
                 }}
-                accessoryLeft={() => <Ionicons name="refresh" size={20} color="white" />}
+                icon={<Ionicons name="refresh" size={20} color="white" />}
               >
-                Restart Game
-              </Button>
+                RESTART GAME
+              </BrutalButton>
               
-              <Button
+              <BrutalButton
                 style={styles.resultsButton}
-                size='large'
-                appearance='outline'
+                variant="outline"
                 onPress={() => navigation.navigate('GameResults')}
-                accessoryLeft={() => <Ionicons name="stats-chart" size={20} color="#6C5CE7" />}
+                icon={<Ionicons name="stats-chart" size={20} color="#6C5CE7" />}
               >
-                View Results
-              </Button>
+                VIEW RESULTS
+              </BrutalButton>
             </View>
           </Card>
         </View>
@@ -234,58 +236,52 @@ export default function GameBoard({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <Layout style={styles.container}>
-        <TopNavigation
-          title='Game Board'
-          accessoryLeft={renderBackAction}
-          style={styles.topNavigation}
+        <BrutalHeader 
+          title="🎮 GAME BOARD"
+          textColor="white"
+          leftAction={
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color={NeoBrutalism.colors.white} />
+            </TouchableOpacity>
+          }
         />
         
         <View style={styles.content}>
           {/* Stats Section */}
-          <View style={styles.statsSection}>
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text category='h6' style={styles.statValue}>{score}</Text>
-                <Text category='c1' style={styles.statLabel}>Score</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text category='h6' style={styles.statValue}>{lives}</Text>
-                <Text category='c1' style={styles.statLabel}>Lives</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text category='h6' style={styles.statValue}>{level}</Text>
-                <Text category='c1' style={styles.statLabel}>Level</Text>
-              </View>
-            </View>
-          </View>
+          <BrutalStats 
+            stats={[
+              { label: 'SCORE', value: score, color: NeoBrutalism.colors.neonYellow },
+              { label: 'LIVES', value: lives, color: NeoBrutalism.colors.hotPink },
+              { label: 'LEVEL', value: level, color: NeoBrutalism.colors.electricBlue }
+            ]}
+            style={styles.statsSection}
+          />
 
           {/* Game Board */}
-          <View style={styles.boardSection}>
+          <BrutalCard style={styles.boardSection}>
             <View style={styles.board}>
               {renderBoard()}
             </View>
-          </View>
+          </BrutalCard>
 
           {/* Dice Section */}
-          <View style={styles.diceSection}>
-            <Text category='h6' style={styles.diceTitle}>Roll to Move</Text>
+          <BrutalCard style={styles.diceSection}>
             <View style={styles.diceValueContainer}>
               {diceValue && (
-                <Text category='h4' style={styles.diceValue}>🎲 {diceValue}</Text>
+                <Text style={brutalTextStyle('h4', 'bold', 'black')}>🎲 {diceValue}</Text>
               )}
             </View>
-            <Button
-              style={styles.rollButton}
-              size='large'
-              accessoryLeft={DiceIcon}
+            <BrutalButton
+              title={isRolling ? 'ROLLING...' : 'ROLL DICE'}
               onPress={rollDice}
+              variant="primary"
+              size="large"
               disabled={isRolling}
-            >
-              {isRolling ? 'Rolling...' : 'Roll Dice'}
-            </Button>
-          </View>
+              icon={<Ionicons name="cube" size={24} color={NeoBrutalism.colors.black} />}
+            />
+          </BrutalCard>
         </View>
 
         {/* Tile Effect Modal */}
@@ -294,19 +290,21 @@ export default function GameBoard({ navigation }) {
           backdropStyle={styles.backdrop}
           onBackdropPress={() => setShowTileEffect(false)}
         >
-          <Card disabled={true} style={styles.effectModal}>
-            <Text category='h5' style={styles.effectTitle}>
+          <BrutalCard style={styles.effectModal}>
+            <Text style={brutalTextStyle('h5', 'bold', 'black')}>
               {currentTileEffect?.title}
             </Text>
-            <Text category='p1' style={styles.effectMessage}>
+            <Text style={[brutalTextStyle('body', 'medium', 'gray'), styles.effectMessage]}>
               {currentTileEffect?.message}
             </Text>
             
             {currentTileEffect?.isChoice ? (
               <View style={styles.choiceButtons}>
                 {currentTileEffect.choices.map((choice, index) => (
-                  <Button
+                  <BrutalButton
                     key={index}
+                    title={choice.text}
+                    variant={index === 0 ? "secondary" : "primary"}
                     style={styles.choiceButton}
                     onPress={() => {
                       if (choice.reward > 0) {
@@ -316,23 +314,21 @@ export default function GameBoard({ navigation }) {
                       }
                       setShowTileEffect(false);
                     }}
-                  >
-                    {choice.text}
-                  </Button>
+                  />
                 ))}
               </View>
             ) : (
-              <Button
+              <BrutalButton
                 style={styles.effectButton}
                 onPress={() => {
                   currentTileEffect?.action?.();
                   setShowTileEffect(false);
                 }}
               >
-                Continue
-              </Button>
+                CONTINUE
+              </BrutalButton>
             )}
-          </Card>
+          </BrutalCard>
         </Modal>
 
         {/* Level Up Modal */}
@@ -341,18 +337,18 @@ export default function GameBoard({ navigation }) {
           backdropStyle={styles.backdrop}
           onBackdropPress={() => clearLevelUp()}
         >
-          <Card disabled={true} style={styles.levelUpModal}>
-            <Text category='h4' style={styles.levelUpTitle}>🎉 LEVEL UP! 🎉</Text>
-            <Text category='h5' style={styles.levelUpText}>
-              Congratulations! You reached Level {level}!
+          <BrutalCard style={styles.levelUpModal}>
+            <Text style={brutalTextStyle('h4', 'bold', 'black')}>🎉 LEVEL UP! 🎉</Text>
+            <Text style={brutalTextStyle('h5', 'bold', 'black')}>
+              CONGRATULATIONS! YOU REACHED LEVEL {level}!
             </Text>
-            <Button
+            <BrutalButton
               style={styles.levelUpButton}
               onPress={() => clearLevelUp()}
             >
-              Awesome!
-            </Button>
-          </Card>
+              AWESOME!
+            </BrutalButton>
+          </BrutalCard>
         </Modal>
     </Layout>
     </SafeAreaView>
@@ -375,11 +371,13 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 12,
+    paddingTop: 24, // Added padding between header and stats section
     paddingBottom: 140, // Extra padding to prevent overlap with bottom nav
   },
   statsSection: {
     marginBottom: 12,
     paddingVertical: 12,
+    marginTop: 8, // Additional spacing from the header
   },
   statsRow: {
     flexDirection: 'row',
@@ -397,8 +395,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   boardSection: {
-    marginBottom: 12,
+    marginBottom: 4,
     alignItems: 'center',
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    padding: 6,
   },
   board: {
     alignSelf: 'center',
@@ -447,6 +448,8 @@ const styles = StyleSheet.create({
     margin: 20,
     alignItems: 'center',
     padding: 20,
+    borderWidth: 0,
+    backgroundColor: NeoBrutalism.colors.white,
   },
   effectTitle: {
     marginBottom: 16,
@@ -471,6 +474,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 30,
     backgroundColor: '#F0F8FF',
+    borderWidth: 0,
   },
   levelUpTitle: {
     color: '#6C5CE7',
@@ -491,8 +495,10 @@ const styles = StyleSheet.create({
   },
   diceSection: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 6,
     paddingHorizontal: 12,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
   },
   diceTitle: {
     marginBottom: 8,

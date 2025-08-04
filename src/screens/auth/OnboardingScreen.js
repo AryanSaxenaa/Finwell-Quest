@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import { Layout, Text, Button, Card } from '@ui-kitten/components';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
+import { Text } from '@ui-kitten/components';
+import { BrutalCard, BrutalButton, brutalTextStyle } from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const { width } = Dimensions.get('window');
 
 const onboardingData = [
   {
-    title: 'Track Your Expenses',
-    subtitle: 'Monitor your spending habits with ease',
-    description: 'Get insights into where your money goes and make informed financial decisions.',
+    title: 'CRUSH YOUR EXPENSES',
+    subtitle: 'DOMINATE YOUR SPENDING HABITS',
+    description: 'TRACK EVERY DOLLAR AND OBLITERATE WASTEFUL SPENDING WITH BRUTAL PRECISION.',
   },
   {
-    title: 'Learn Through Gaming',
-    subtitle: 'Financial education made fun',
-    description: 'Play engaging games while learning essential financial literacy skills.',
+    title: 'GAME YOUR WAY TO RICHES',
+    subtitle: 'FINANCIAL EDUCATION THROUGH BATTLE',
+    description: 'DEFEAT FINANCIAL IGNORANCE WITH OUR HARDCORE GAMING EXPERIENCE.',
   },
   {
-    title: 'AI-Powered Advice',
-    subtitle: 'Personal financial assistant',
-    description: 'Get personalized financial advice from our AI coach tailored to your spending patterns.',
+    title: 'AI FINANCIAL WARFARE',
+    subtitle: 'YOUR PERSONAL MONEY GENERAL',
+    description: 'GET RUTHLESS AI-POWERED ADVICE THAT DESTROYS BAD FINANCIAL HABITS.',
   },
 ];
 
@@ -39,22 +40,19 @@ export default function OnboardingScreen({ navigation }) {
   };
 
   return (
-    <LinearGradient
-      colors={['#6C5CE7', '#A29BFE']}
-      style={styles.container}
-    >
-      <Layout style={styles.content}>
-        <Card style={styles.card}>
-          <Text category='h4' style={styles.title}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <BrutalCard style={styles.card}>
+          <Text style={[brutalTextStyle.title, styles.title]}>
             {onboardingData[currentSlide].title}
           </Text>
-          <Text category='s1' style={styles.subtitle}>
+          <Text style={[brutalTextStyle.subtitle, styles.subtitle]}>
             {onboardingData[currentSlide].subtitle}
           </Text>
-          <Text category='p1' style={styles.description}>
+          <Text style={[brutalTextStyle.body, styles.description]}>
             {onboardingData[currentSlide].description}
           </Text>
-        </Card>
+        </BrutalCard>
         
         <View style={styles.pagination}>
           {onboardingData.map((_, index) => (
@@ -62,39 +60,37 @@ export default function OnboardingScreen({ navigation }) {
               key={index}
               style={[
                 styles.dot,
-                { backgroundColor: index === currentSlide ? '#6C5CE7' : '#DDD' }
+                { backgroundColor: index === currentSlide ? NeoBrutalism.colors.neonYellow : NeoBrutalism.colors.gray }
               ]}
             />
           ))}
         </View>
 
         <View style={styles.buttonContainer}>
-          <Button 
-            appearance='ghost' 
+          <BrutalButton 
+            title="SKIP"
+            variant="outline"
             onPress={skipOnboarding}
             style={styles.skipButton}
-          >
-            Skip
-          </Button>
-          <Button 
+          />
+          <BrutalButton 
+            title={currentSlide === onboardingData.length - 1 ? 'UNLEASH THE POWER' : 'NEXT'}
             onPress={nextSlide}
             style={styles.nextButton}
-          >
-            {currentSlide === onboardingData.length - 1 ? 'Get Started' : 'Next'}
-          </Button>
+          />
         </View>
-      </Layout>
-    </LinearGradient>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
-    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -103,31 +99,44 @@ const styles = StyleSheet.create({
     width: width - 40,
     padding: 30,
     marginBottom: 40,
-    borderRadius: 15,
+    backgroundColor: NeoBrutalism.colors.lightGray,
+    borderWidth: 4,
+    borderColor: NeoBrutalism.colors.black,
   },
   title: {
     textAlign: 'center',
-    marginBottom: 10,
-    fontWeight: 'bold',
+    marginBottom: 15,
+    color: NeoBrutalism.colors.black,
+    fontSize: 28,
+    fontWeight: '900',
+    textShadowColor: NeoBrutalism.colors.neonBlue,
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 0,
   },
   subtitle: {
     textAlign: 'center',
-    marginBottom: 15,
-    color: '#6C5CE7',
+    marginBottom: 20,
+    color: NeoBrutalism.colors.black,
+    fontSize: 18,
+    fontWeight: '700',
   },
   description: {
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
+    color: NeoBrutalism.colors.black,
+    fontSize: 16,
+    fontWeight: '600',
   },
   pagination: {
     flexDirection: 'row',
     marginBottom: 40,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
+    width: 12,
+    height: 12,
+    borderWidth: 2,
+    borderColor: NeoBrutalism.colors.black,
+    marginHorizontal: 6,
   },
   buttonContainer: {
     flexDirection: 'row',

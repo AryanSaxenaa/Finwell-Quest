@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Layout, Text, Spinner } from '@ui-kitten/components';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { Layout, Text } from '@ui-kitten/components';
 import { useAuthStore } from '../../store';
+import { brutalTextStyle } from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 export default function SplashScreen({ navigation }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -20,9 +22,19 @@ export default function SplashScreen({ navigation }) {
 
   return (
     <Layout style={styles.container}>
-      <Text category='h1' style={styles.title}>FinPath Quest</Text>
-      <Text category='s1' style={styles.subtitle}>Your Financial Journey Starts Here</Text>
-      <Spinner size='large' style={styles.spinner} />
+      <View style={styles.logoContainer}>
+        <Text style={brutalTextStyle('h1', 'bold', 'black')}>FINPATH</Text>
+        <Text style={brutalTextStyle('h1', 'bold', 'neonYellow')}>QUEST</Text>
+      </View>
+      <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.subtitle]}>
+        YOUR FINANCIAL JOURNEY STARTS HERE
+      </Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={NeoBrutalism.colors.neonYellow} />
+        <Text style={[brutalTextStyle('body', 'bold', 'black'), styles.loadingText]}>
+          LOADING...
+        </Text>
+      </View>
     </Layout>
   );
 }
@@ -32,19 +44,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#6C5CE7',
+    backgroundColor: NeoBrutalism.colors.white,
+    padding: NeoBrutalism.spacing.xl,
   },
-  title: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginBottom: 8,
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: NeoBrutalism.spacing.lg,
   },
   subtitle: {
-    color: 'white',
-    opacity: 0.8,
-    marginBottom: 40,
+    textAlign: 'center',
+    marginBottom: NeoBrutalism.spacing.xl,
+    letterSpacing: 1,
+    color: NeoBrutalism.colors.black,
   },
-  spinner: {
-    borderColor: 'white',
+  loadingContainer: {
+    alignItems: 'center',
+    marginTop: NeoBrutalism.spacing.xl,
+  },
+  loadingText: {
+    marginTop: NeoBrutalism.spacing.md,
+    letterSpacing: 2,
   },
 });

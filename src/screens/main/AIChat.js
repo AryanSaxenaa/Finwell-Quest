@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Dimensions, Text as RNText, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Dimensions, Text as RNText, Alert, TouchableOpacity } from 'react-native';
 import { 
   Layout, 
   Text, 
-  Input, 
-  Button, 
-  Card, 
-  TopNavigation,
-  ButtonGroup 
+  Input
 } from '@ui-kitten/components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useChatStore, useExpenseStore, useGameStore } from '../../store';
+import { NeoBrutalism, brutalTextStyle } from '../../styles/neoBrutalism';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  BrutalHeader,
+  BrutalIllustration 
+} from '../../components/BrutalComponents';
 
 const SendIcon = (props) => <Ionicons name="paper-plane-outline" size={24} color="white" />;
 
@@ -27,9 +30,27 @@ export default function AIChat({ navigation }) {
   const { score, level, aiTokens, useAIToken, hasAITokens } = useGameStore();
 
   const aiModes = [
-    { title: 'Advisor', value: 'advisor' },
-    { title: 'Hype', value: 'hype' },
-    { title: 'Roast', value: 'roast' },
+    { 
+      title: 'ADVISOR', 
+      value: 'advisor', 
+      icon: 'business-outline',
+      color: 'electricBlue',
+      description: 'PROFESSIONAL FINANCIAL ADVICE'
+    },
+    { 
+      title: 'HYPE', 
+      value: 'hype', 
+      icon: 'rocket-outline',
+      color: 'neonGreen',
+      description: 'MOTIVATIONAL FINANCIAL COACH'
+    },
+    { 
+      title: 'ROAST', 
+      value: 'roast', 
+      icon: 'flame-outline',
+      color: 'hotPink',
+      description: 'BRUTALLY HONEST FEEDBACK'
+    },
   ];
 
   const handleSend = () => {
@@ -128,57 +149,101 @@ export default function AIChat({ navigation }) {
 
   const renderMessage = (msg) => (
     <View key={msg.id} style={[
-      styles.message,
-      msg.sender === 'user' ? styles.userMessage : styles.aiMessage
+      styles.messageContainer,
+      msg.sender === 'user' ? styles.userMessageContainer : styles.aiMessageContainer
     ]}>
-      <RNText style={msg.sender === 'user' ? styles.userText : styles.aiText}>
-        {msg.text}
-      </RNText>
+      <View style={[
+        styles.message,
+        msg.sender === 'user' ? styles.userMessage : styles.aiMessage
+      ]}>
+        <View style={styles.messageHeader}>
+          <View style={[
+            styles.messageSender,
+            { backgroundColor: msg.sender === 'user' ? NeoBrutalism.colors.electricBlue : NeoBrutalism.colors.neonGreen }
+          ]}>
+            <Ionicons 
+              name={msg.sender === 'user' ? 'person' : 'chatbubble-ellipses'} 
+              size={12} 
+              color={NeoBrutalism.colors.black} 
+            />
+            <Text style={brutalTextStyle('caption', 'bold', 'black')}>
+              {msg.sender === 'user' ? 'YOU' : 'AI'}
+            </Text>
+          </View>
+        </View>
+        <Text style={[
+          brutalTextStyle('body', 'medium', 'black'),
+          styles.messageText
+        ]}>
+          {msg.text}
+        </Text>
+      </View>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <Layout style={styles.container}>
-        <TopNavigation title='AI Assistant' alignment='center' style={styles.topNavigation} />
+        <BrutalHeader 
+          title="AI ADVISOR"
+          rightAction={
+            <View style={styles.tokenBadge}>
+              <Ionicons name="diamond" size={16} color={NeoBrutalism.colors.black} />
+              <Text style={brutalTextStyle('caption', 'bold', 'black')}>
+                {aiTokens}
+              </Text>
+            </View>
+          }
+        />
       
       <KeyboardAvoidingView 
         style={styles.content}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        <Card style={styles.tokenCard}>
+        {/* Token Info Section */}
+        <View style={styles.tokenSection}>
           <View style={styles.tokenHeader}>
-            <Ionicons name="diamond" size={20} color="#FFD700" />
-            <Text category='s1' style={styles.tokenTitle}>AI Tokens: {aiTokens}</Text>
+            <Ionicons name="diamond" size={20} color={NeoBrutalism.colors.hotPink} />
+            <Text style={brutalTextStyle('h6', 'bold', 'black')}>
+              AI TOKENS: {aiTokens}
+            </Text>
+            <Text style={brutalTextStyle('caption', 'medium', 'gray')}>
+              {aiTokens > 0 
+                ? 'EACH MESSAGE COSTS 1 TOKEN' 
+                : 'EARN TOKENS BY LEARNING!'}
+            </Text>
           </View>
-          <Text category='c1' style={styles.tokenSubtitle}>
-            {aiTokens > 0 
-              ? 'Each message costs 1 token' 
-              : 'Earn tokens by learning topics!'}
-          </Text>
-        </Card>
+        </View>
 
-        <Card style={styles.modeCard}>
-          <Text category='s1' style={styles.modeTitle}>AI Personality:</Text>
-          <ButtonGroup style={styles.modeButtons}>
-            {aiModes.map((mode, index) => (
-              <Button
+        {/* AI Mode Selection */}
+        <View style={styles.modeSection}>
+          <View style={styles.modeGrid}>
+            {aiModes.map((mode) => (
+              <TouchableOpacity
                 key={mode.value}
                 style={[
                   styles.modeButton,
                   aiMode === mode.value && styles.activeModeButton
                 ]}
-                appearance={aiMode === mode.value ? 'filled' : 'outline'}
-                size='small'
                 onPress={() => setAIMode(mode.value)}
               >
-                {mode.title}
-              </Button>
+                <View style={[styles.modeIcon, { backgroundColor: NeoBrutalism.colors[mode.color] }]}>
+                  <Ionicons 
+                    name={mode.icon} 
+                    size={20} 
+                    color={NeoBrutalism.colors.black} 
+                  />
+                </View>
+                <Text style={brutalTextStyle('caption', 'bold', 'black')}>
+                  {mode.title}
+                </Text>
+              </TouchableOpacity>
             ))}
-          </ButtonGroup>
-        </Card>
+          </View>
+        </View>
 
+        {/* Chat Area */}
         <ScrollView 
           style={styles.chatContainer}
           keyboardShouldPersistTaps="handled"
@@ -186,29 +251,51 @@ export default function AIChat({ navigation }) {
           contentContainerStyle={styles.chatContent}
         >
           {chatHistory.length === 0 ? (
-            <Text style={styles.emptyChat}>
-              Start a conversation with your AI financial assistant!
-            </Text>
+            <View style={styles.emptyChatCard}>
+              <BrutalIllustration
+                source={require('../../../assets/icon.png')}
+                size="large"
+                style={[styles.emptyChatIcon, { borderWidth: 0 }]}
+              />
+              <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.emptyChatTitle]}>
+                START CHATTING!
+              </Text>
+              <Text style={brutalTextStyle('caption', 'medium', 'gray')}>
+                ASK YOUR AI FINANCIAL ASSISTANT ANYTHING!
+              </Text>
+            </View>
           ) : (
             chatHistory.map(renderMessage)
           )}
         </ScrollView>
 
+        {/* Input Area */}
         <View style={styles.inputContainer}>
-          <Input
-            style={styles.input}
-            placeholder="Ask about your finances..."
-            value={message}
-            onChangeText={setMessage}
-            onSubmitEditing={handleSend}
-            returnKeyType="send"
-          />
-          <Button
-            style={styles.sendButton}
-            accessoryLeft={SendIcon}
-            onPress={handleSend}
-            disabled={!message.trim()}
-          />
+          <View style={styles.inputWrapper}>
+            <Input
+              style={styles.input}
+              placeholder="ASK ABOUT YOUR FINANCES..."
+              value={message}
+              onChangeText={setMessage}
+              onSubmitEditing={handleSend}
+              returnKeyType="send"
+              textStyle={styles.inputText}
+            />
+            <TouchableOpacity
+              onPress={handleSend}
+              disabled={!message.trim()}
+              style={[
+                styles.sendButton,
+                { opacity: !message.trim() ? 0.5 : 1 }
+              ]}
+            >
+              <Ionicons 
+                name="paper-plane" 
+                size={20} 
+                color={NeoBrutalism.colors.black} 
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </Layout>
@@ -219,115 +306,178 @@ export default function AIChat({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  topNavigation: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 8,
+    backgroundColor: NeoBrutalism.colors.white,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: NeoBrutalism.spacing.md, // Reduced from lg
+    paddingTop: NeoBrutalism.spacing.md, // Reduced from lg
+    paddingBottom: NeoBrutalism.spacing.sm,
   },
-  tokenCard: {
-    marginBottom: 16,
-    backgroundColor: '#FFF9E6',
-    borderLeftWidth: 4,
-    borderLeftColor: '#FFD700',
+  
+  // Token Badge in Header
+  tokenBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: NeoBrutalism.colors.neonYellow,
+    paddingHorizontal: NeoBrutalism.spacing.sm,
+    paddingVertical: NeoBrutalism.spacing.xs,
+    borderWidth: NeoBrutalism.borders.thick,
+    borderColor: NeoBrutalism.colors.black,
+    gap: NeoBrutalism.spacing.xs,
+  },
+  
+  // Token Section
+  tokenSection: {
+    marginBottom: NeoBrutalism.spacing.md,
+    paddingVertical: NeoBrutalism.spacing.sm,
   },
   tokenHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    gap: NeoBrutalism.spacing.sm,
+    justifyContent: 'space-between',
   },
-  tokenTitle: {
-    marginLeft: 8,
-    fontWeight: 'bold',
-    color: '#D4AF37',
-  },
-  tokenSubtitle: {
-    color: '#8B7355',
-    fontSize: 12,
-  },
-  modeCard: {
-    marginBottom: 16,
+  
+  // Mode Selection
+  modeSection: {
+    marginBottom: NeoBrutalism.spacing.lg,
   },
   modeTitle: {
-    marginBottom: 8,
+    marginBottom: NeoBrutalism.spacing.md,
   },
-  modeButtons: {
+  modeGrid: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: NeoBrutalism.spacing.sm,
   },
   modeButton: {
     flex: 1,
-    marginHorizontal: 4,
+    alignItems: 'center',
+    padding: NeoBrutalism.spacing.sm, // Reduced from md
+    borderWidth: NeoBrutalism.borders.thick,
+    borderColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.white,
   },
   activeModeButton: {
-    backgroundColor: '#6C5CE7',
+    backgroundColor: NeoBrutalism.colors.lightGray,
+    transform: [{ scale: 0.95 }],
   },
+  modeIcon: {
+    width: 28, // Reduced from 32
+    height: 28, // Reduced from 32
+    borderRadius: 6,
+    borderWidth: NeoBrutalism.borders.medium,
+    borderColor: NeoBrutalism.colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: NeoBrutalism.spacing.xs,
+  },
+  modeDescription: {
+    textAlign: 'center',
+    marginTop: NeoBrutalism.spacing.xs,
+    fontSize: 9, // Reduced from 10
+  },
+  
+  // Chat Area
   chatContainer: {
     flex: 1,
-    marginBottom: 8,
+    marginBottom: NeoBrutalism.spacing.sm,
+    backgroundColor: '#E8EDF3', // Darker blue-gray background
+    borderWidth: 0, // Removed border
   },
   chatContent: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingBottom: NeoBrutalism.spacing.lg,
   },
-  emptyChat: {
-    textAlign: 'center',
-    fontStyle: 'italic',
-    opacity: 0.6,
-    padding: 20,
+  emptyChatCard: {
+    alignItems: 'center',
+    padding: NeoBrutalism.spacing.xl,
+    marginTop: NeoBrutalism.spacing.xl,
+  },
+  emptyChatIcon: {
+    marginBottom: NeoBrutalism.spacing.md,
+  },
+  emptyChatTitle: {
+    marginBottom: NeoBrutalism.spacing.sm,
+  },
+  
+  // Messages
+  messageContainer: {
+    marginBottom: NeoBrutalism.spacing.md,
+  },
+  userMessageContainer: {
+    alignItems: 'flex-end',
+  },
+  aiMessageContainer: {
+    alignItems: 'flex-start',
   },
   message: {
-    marginBottom: 12,
-    padding: 12,
-    borderRadius: 12,
-    maxWidth: '80%',
+    maxWidth: '85%',
+    padding: NeoBrutalism.spacing.md,
+    borderWidth: 0, // Removed black border
+    borderRadius: 8, // Added slight border radius for modern look
   },
   userMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#6C5CE7',
+    backgroundColor: NeoBrutalism.colors.electricBlue,
   },
   aiMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#F3F4F6',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
+    backgroundColor: NeoBrutalism.colors.white,
   },
-  userText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 16,
+  messageHeader: {
+    marginBottom: NeoBrutalism.spacing.xs,
   },
-  aiText: {
-    color: '#000000',
-    fontWeight: '700',
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  inputContainer: {
+  messageSender: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#FFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    minHeight: 60,
+    paddingHorizontal: NeoBrutalism.spacing.xs,
+    paddingVertical: 2,
+    borderWidth: 0, // Removed black border
+    gap: 4,
+    alignSelf: 'flex-start',
+    borderRadius: 12, // Added border radius for modern pill shape
+  },
+  messageText: {
+    lineHeight: 20,
+  },
+  
+  // Input Area
+  inputContainer: {
+    paddingHorizontal: NeoBrutalism.spacing.lg,
+    paddingVertical: NeoBrutalism.spacing.md,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderTopWidth: NeoBrutalism.borders.thick,
+    borderTopColor: NeoBrutalism.colors.black,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: NeoBrutalism.spacing.xs, // Reduced gap to give more space to input
   },
   input: {
     flex: 1,
-    marginRight: 8,
-    backgroundColor: '#F8F9FA',
+    borderWidth: NeoBrutalism.borders.thick,
+    borderColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.white,
+    minHeight: 50, // Ensure minimum height for placeholder visibility
+    marginRight: NeoBrutalism.spacing.xs, // Add margin to increase text input width
+  },
+  inputText: {
+    fontSize: 16,
+    fontWeight: '500',
+    paddingVertical: 8, // Add vertical padding for better text positioning
   },
   sendButton: {
-    paddingHorizontal: 16,
+    width: 40,
+    height: 40,
+    borderWidth: NeoBrutalism.borders.medium,
+    borderColor: NeoBrutalism.colors.black,
+    backgroundColor: NeoBrutalism.colors.neonYellow,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

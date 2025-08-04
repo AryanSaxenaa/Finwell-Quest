@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { 
   Layout, 
   Text, 
-  Card, 
-  Button,
-  TopNavigation,
-  TopNavigationAction,
   Input,
   Modal 
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useBudgetStore, useExpenseStore } from '../../store';
+import { 
+  BrutalCard, 
+  BrutalButton, 
+  BrutalHeader,
+  brutalTextStyle 
+} from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const BackIcon = (props) => <Ionicons name="arrow-back" size={24} color="#8F9BB3" />;
 const PlusIcon = (props) => <Ionicons name="add-outline" size={24} color="#8F9BB3" />;
@@ -64,34 +68,38 @@ export default function BudgetManagement({ navigation }) {
     };
 
     return (
-      <Card style={styles.budgetCard}>
+      <BrutalCard style={styles.budgetCard}>
         <View style={styles.budgetHeader}>
           <View style={styles.categoryInfo}>
             <View 
               style={[styles.categoryDot, { backgroundColor: budget.color }]} 
             />
-            <Text category='h6' style={styles.categoryName}>
-              {budget.category}
+            <Text style={brutalTextStyle('h6', 'bold', 'black')}>
+              {budget.category.toUpperCase()}
             </Text>
           </View>
           <Text 
-            category='c1' 
             style={[
+              brutalTextStyle('caption', 'bold', budget.isOverBudget ? 'white' : 'black'),
               styles.statusText,
-              { color: budget.isOverBudget ? '#E74C3C' : '#27AE60' }
+              { 
+                backgroundColor: budget.isOverBudget ? NeoBrutalism.colors.hotPink : NeoBrutalism.colors.neonGreen,
+                paddingHorizontal: NeoBrutalism.spacing.sm,
+                paddingVertical: NeoBrutalism.spacing.xs
+              }
             ]}
           >
-            {budget.isOverBudget ? 'Over Budget' : 'On Track'}
+            {budget.isOverBudget ? 'OVER BUDGET' : 'ON TRACK'}
           </Text>
         </View>
 
         <View style={styles.amountSection}>
           <View style={styles.amountRow}>
-            <Text category='h4' style={styles.spentAmount}>
+            <Text style={brutalTextStyle('h4', 'bold', 'black')}>
               ${budget.spent}
             </Text>
-            <Text category='p1' style={styles.limitText}>
-              of ${budget.limit}
+            <Text style={brutalTextStyle('body', 'medium', 'gray')}>
+              OF ${budget.limit}
             </Text>
           </View>
           
@@ -102,26 +110,30 @@ export default function BudgetManagement({ navigation }) {
                   styles.progressFill, 
                   { 
                     width: `${Math.min(budget.percentage, 100)}%`,
-                    backgroundColor: budget.isOverBudget ? '#E74C3C' : budget.color 
+                    backgroundColor: budget.isOverBudget ? NeoBrutalism.colors.hotPink : budget.color 
                   }
                 ]} 
               />
             </View>
-            <Text category='c1' style={styles.percentageText}>
+            <Text style={brutalTextStyle('caption', 'bold', 'black')}>
               {budget.percentage}%
             </Text>
           </View>
 
           <Text 
-            category='p2' 
             style={[
+              brutalTextStyle('body', 'medium', budget.isOverBudget ? 'white' : 'gray'),
               styles.remainingText,
-              { color: budget.isOverBudget ? '#E74C3C' : '#8F9BB3' }
+              { 
+                backgroundColor: budget.isOverBudget ? NeoBrutalism.colors.hotPink : 'transparent',
+                paddingHorizontal: budget.isOverBudget ? NeoBrutalism.spacing.sm : 0,
+                paddingVertical: budget.isOverBudget ? NeoBrutalism.spacing.xs : 0
+              }
             ]}
           >
             {budget.isOverBudget 
-              ? `$${Math.abs(budget.remaining)} over budget`
-              : `$${budget.remaining} remaining this month`
+              ? `$${Math.abs(budget.remaining)} OVER BUDGET`
+              : `$${budget.remaining} REMAINING THIS MONTH`
             }
           </Text>
         </View>
@@ -134,133 +146,143 @@ export default function BudgetManagement({ navigation }) {
                 value={editLimit}
                 onChangeText={setEditLimit}
                 keyboardType="numeric"
-                placeholder="Budget limit"
+                placeholder="BUDGET LIMIT"
               />
-              <Button size="small" onPress={handleSaveLimit}>
-                Save
-              </Button>
-              <Button 
+              <BrutalButton title="SAVE" size="small" variant="primary" onPress={handleSaveLimit} />
+              <BrutalButton 
+                title="CANCEL"
                 size="small" 
-                appearance="ghost" 
+                variant="secondary"
                 onPress={() => {
                   setEditLimit(budget.limit.toString());
                   setIsEditing(false);
                 }}
-              >
-                Cancel
-              </Button>
+              />
             </View>
           ) : (
-            <Button 
+            <BrutalButton 
+              title="EDIT BUDGET LIMIT"
               size="small" 
-              appearance="outline"
+              variant="secondary"
               onPress={() => setIsEditing(true)}
-            >
-              Edit Budget Limit
-            </Button>
+            />
           )}
         </View>
-      </Card>
+      </BrutalCard>
     );
   };
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation
-        title='Budget Management'
-        accessoryLeft={renderBackAction}
-        accessoryRight={renderAddAction}
-      />
-      
-      <ScrollView style={styles.content}>
-        <Text category='h6' style={styles.sectionTitle}>
-          Monthly Budgets
-        </Text>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <Layout style={styles.container}>
+        <BrutalHeader 
+          title="BUDGET MANAGEMENT"
+          leftAction={
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color={NeoBrutalism.colors.black} />
+            </TouchableOpacity>
+          }
+          rightAction={
+            <TouchableOpacity onPress={() => setShowAddModal(true)}>
+              <Ionicons name="add" size={24} color={NeoBrutalism.colors.black} />
+            </TouchableOpacity>
+          }
+        />
         
-        {budgets.map((budget) => (
-          <BudgetDetailCard key={budget.id} budget={budget} />
-        ))}
-      </ScrollView>
-
-      <Modal
-        visible={showAddModal}
-        backdropStyle={styles.backdrop}
-        onBackdropPress={() => setShowAddModal(false)}
-      >
-        <Card disabled={true}>
-          <Text category='h6' style={styles.modalTitle}>
-            Add New Budget
+        <ScrollView style={styles.content}>
+          <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.sectionTitle]}>
+            MONTHLY BUDGETS
           </Text>
           
-          <Input
-            style={styles.input}
-            label="Category"
-            placeholder="Enter category name"
-            value={newBudgetCategory}
-            onChangeText={setNewBudgetCategory}
-          />
-          
-          <Input
-            style={styles.input}
-            label="Monthly Budget Limit"
-            placeholder="Enter amount"
-            value={newBudgetLimit}
-            onChangeText={setNewBudgetLimit}
-            keyboardType="numeric"
-          />
-          
-          <View style={styles.modalButtons}>
-            <Button 
-              style={styles.modalButton}
-              appearance="outline"
-              onPress={() => setShowAddModal(false)}
-            >
-              Cancel
-            </Button>
-            <Button 
-              style={styles.modalButton}
-              onPress={handleAddBudget}
-            >
-              Add Budget
-            </Button>
-          </View>
-        </Card>
-      </Modal>
-    </Layout>
+          {budgets.map((budget) => (
+            <BudgetDetailCard key={budget.id} budget={budget} />
+          ))}
+        </ScrollView>
+
+        <Modal
+          visible={showAddModal}
+          backdropStyle={styles.backdrop}
+          onBackdropPress={() => setShowAddModal(false)}
+        >
+          <BrutalCard style={styles.modalCard}>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.modalTitle]}>
+              ADD NEW BUDGET
+            </Text>
+            
+            <Input
+              style={styles.input}
+              label="CATEGORY"
+              placeholder="ENTER CATEGORY NAME"
+              value={newBudgetCategory}
+              onChangeText={setNewBudgetCategory}
+            />
+            
+            <Input
+              style={styles.input}
+              label="MONTHLY BUDGET LIMIT"
+              placeholder="ENTER AMOUNT"
+              value={newBudgetLimit}
+              onChangeText={setNewBudgetLimit}
+              keyboardType="numeric"
+            />
+            
+            <View style={styles.modalButtons}>
+              <BrutalButton 
+                title="CANCEL"
+                variant="secondary"
+                style={styles.modalButton}
+                onPress={() => setShowAddModal(false)}
+              />
+              <BrutalButton 
+                title="ADD BUDGET"
+                variant="primary"
+                style={styles.modalButton}
+                onPress={handleAddBudget}
+              />
+            </View>
+          </BrutalCard>
+        </Modal>
+      </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: NeoBrutalism.colors.white,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.background,
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: NeoBrutalism.spacing.lg,
   },
   sectionTitle: {
-    marginBottom: 16,
-    fontWeight: 'bold',
+    marginBottom: NeoBrutalism.spacing.lg,
   },
   budgetCard: {
-    marginBottom: 16,
+    marginBottom: NeoBrutalism.spacing.lg,
   },
   budgetHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: NeoBrutalism.spacing.lg,
   },
   categoryInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   categoryDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 8,
+    width: 16,
+    height: 16,
+    borderRadius: 0,
+    marginRight: NeoBrutalism.spacing.sm,
+    borderWidth: NeoBrutalism.borders.medium,
+    borderColor: NeoBrutalism.colors.black,
   },
   categoryName: {
     fontWeight: 'bold',

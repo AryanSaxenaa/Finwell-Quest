@@ -3,14 +3,14 @@ import { View, StyleSheet } from 'react-native';
 import { 
   Layout, 
   Text, 
-  Button, 
-  Card, 
   TopNavigation,
   TopNavigationAction 
 } from '@ui-kitten/components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
+import { BrutalCard, BrutalButton, brutalTextStyle } from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 const TrophyIcon = (props) => <Ionicons name="trophy" size={64} color="#FFD700" />;
 const BackIcon = (props) => <Ionicons name="arrow-back" size={24} color="#8F9BB3" />;
@@ -169,19 +169,19 @@ export default function GameResults({ navigation }) {
         </Card>
 
         <View style={styles.buttonContainer}>
-          <Button
+          <BrutalButton
             style={styles.button}
             onPress={handlePlayAgain}
           >
-            🎮 Play Again
-          </Button>
-          <Button
+            🎮 PLAY AGAIN
+          </BrutalButton>
+          <BrutalButton
             style={styles.button}
-            appearance='outline'
+            variant="outline"
             onPress={handleReturnHome}
           >
-            🏠 Return Home
-          </Button>
+            🏠 RETURN HOME
+          </BrutalButton>
         </View>
       </View>
     </Layout>

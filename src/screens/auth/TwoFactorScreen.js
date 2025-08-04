@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Layout, Text, Input, Button } from '@ui-kitten/components';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { Text, Input } from '@ui-kitten/components';
+import { BrutalCard, BrutalButton, brutalTextStyle } from '../../components/BrutalComponents';
+import { NeoBrutalism } from '../../styles/neoBrutalism';
 
 export default function TwoFactorScreen({ navigation }) {
   const [code, setCode] = useState('');
@@ -35,85 +37,110 @@ export default function TwoFactorScreen({ navigation }) {
   };
 
   return (
-    <Layout style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text category='h3' style={styles.title}>Verify Your Account</Text>
-        <Text category='s1' style={styles.subtitle}>
-          Enter the 6-digit code sent to your email
+        <Text style={[brutalTextStyle.title, styles.title]}>VERIFY ACCOUNT</Text>
+        <Text style={[brutalTextStyle.body, styles.subtitle]}>
+          ENTER THE 6-DIGIT BATTLEFIELD CODE
         </Text>
 
-        <Input
-          style={styles.input}
-          placeholder='6-digit code'
-          value={code}
-          onChangeText={setCode}
-          keyboardType='numeric'
-          maxLength={6}
-          textAlign='center'
-          size='large'
-        />
+        <BrutalCard style={styles.codeContainer}>
+          <Input
+            style={styles.input}
+            placeholder='XXXXXX'
+            value={code}
+            onChangeText={setCode}
+            keyboardType='numeric'
+            maxLength={6}
+            textAlign='center'
+            size='large'
+            textStyle={styles.codeInput}
+          />
 
-        <Button
-          style={styles.verifyButton}
-          onPress={handleVerify}
-          disabled={code.length !== 6}
-        >
-          Verify Code
-        </Button>
+          <BrutalButton
+            style={styles.verifyButton}
+            onPress={handleVerify}
+            disabled={code.length !== 6}
+          >
+            VERIFY CODE
+          </BrutalButton>
 
-        <Button
-          style={styles.resendButton}
-          appearance='ghost'
-          onPress={handleResend}
-          disabled={!canResend}
-        >
-          {canResend ? 'Resend Code' : `Resend in ${timer}s`}
-        </Button>
+          <BrutalButton
+            style={styles.resendButton}
+            variant="secondary"
+            onPress={handleResend}
+            disabled={!canResend}
+          >
+            {canResend ? 'RESEND CODE' : `RESEND IN ${timer}S`}
+          </BrutalButton>
+        </BrutalCard>
 
-        <Text 
-          style={styles.backToLogin}
+        <BrutalButton
+          style={styles.backButton}
+          variant="outline"
           onPress={() => navigation.navigate('Login')}
         >
-          Back to Login
-        </Text>
+          BACK TO LOGIN
+        </BrutalButton>
       </View>
-    </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: NeoBrutalism.colors.white,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     justifyContent: 'center',
   },
   title: {
     textAlign: 'center',
     marginBottom: 8,
-    fontWeight: 'bold',
+    color: NeoBrutalism.colors.black,
+    fontSize: 32,
+    fontWeight: '900',
+    textShadowColor: NeoBrutalism.colors.neonPink,
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 0,
   },
   subtitle: {
     textAlign: 'center',
     marginBottom: 40,
-    opacity: 0.7,
+    color: NeoBrutalism.colors.black,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  codeContainer: {
+    padding: 30,
+    marginBottom: 30,
+    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   input: {
     marginBottom: 30,
-    fontSize: 24,
+    backgroundColor: NeoBrutalism.colors.white,
+    borderWidth: 4,
+    borderColor: NeoBrutalism.colors.black,
+    borderRadius: 0,
+  },
+  codeInput: {
+    fontSize: 28,
+    fontWeight: '900',
+    textAlign: 'center',
+    letterSpacing: 8,
+    color: NeoBrutalism.colors.black,
   },
   verifyButton: {
     marginBottom: 20,
   },
   resendButton: {
-    marginBottom: 30,
+    marginBottom: 10,
   },
-  backToLogin: {
-    textAlign: 'center',
-    color: '#6C5CE7',
-    textDecorationLine: 'underline',
+  backButton: {
+    alignSelf: 'center',
+    paddingHorizontal: 40,
   },
 });
