@@ -111,7 +111,17 @@ export default function HomeDashboard({ navigation }) {
                 <View style={styles.doughnutOverlay}>
                   <View style={styles.chartCenter}>
                     <Text style={styles.chartCenterLabel}>Total Spent</Text>
-                    <Text style={styles.chartCenterAmount}>${totalAmount.toLocaleString()}</Text>
+                    <Text 
+                      style={[
+                        styles.chartCenterAmount, 
+                        totalAmount >= 10000 && styles.chartCenterAmountLarge,
+                        totalAmount >= 100000 && styles.chartCenterAmountVeryLarge
+                      ]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit={true}
+                    >
+                      ${totalAmount.toLocaleString()}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -352,20 +362,33 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 8, // Add padding to prevent text overflow
   },
   chartCenter: {
     alignItems: 'center',
     justifyContent: 'center',
+    maxWidth: 84, // Slightly less than overlay width to ensure text fits
   },
   chartCenterLabel: {
     fontSize: 12,
     color: '#9CA3AF',
     marginBottom: 4,
+    textAlign: 'center',
   },
   chartCenterAmount: {
     fontSize: 24,
     fontWeight: '700',
     color: '#000000',
+    textAlign: 'center',
+    lineHeight: 26,
+  },
+  chartCenterAmountLarge: {
+    fontSize: 18, // Smaller font for amounts >= $10,000
+    lineHeight: 20,
+  },
+  chartCenterAmountVeryLarge: {
+    fontSize: 14, // Even smaller font for amounts >= $100,000
+    lineHeight: 16,
   },
   categoryLegend: {
     marginBottom: 24,
