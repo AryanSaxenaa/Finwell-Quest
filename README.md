@@ -41,6 +41,49 @@ FinWell Quest is a modern, gamified personal finance management app built with R
 - **Component-Driven Architecture:** All UI elements are built as reusable, theme-aware components for consistency and scalability.
 - **Testing & Linting:** Codebase is structured for maintainability and extensibility, with best practices for error handling and user feedback.
 
+## Screenshots
+Home Page (before adding any transaction or Connecting the bank account)
+![WhatsApp Image 2025-08-04 at 23 34 11_de984e30](https://github.com/user-attachments/assets/8d69be0d-8362-4af5-b00a-529fecbd73b9)
+
+Connecting bank using Plaid API
+![WhatsApp Image 2025-08-04 at 23 34 15_a352f12c](https://github.com/user-attachments/assets/5a59bcff-5179-4d33-bfcf-f96cc1bcac1e)
+
+
+Home Page (After adding transactions)
+![WhatsApp Image 2025-08-04 at 23 46 41_b314d159](https://github.com/user-attachments/assets/92546708-94da-4f59-826c-28bf6bdade94)
+
+
+Game Center
+![WhatsApp Image 2025-08-04 at 23 34 13_033b021a](https://github.com/user-attachments/assets/b4775418-4b32-4fdf-8cd1-c99b7f97c571)
+
+Game Board
+![WhatsApp Image 2025-08-04 at 23 34 14_eff2463f](https://github.com/user-attachments/assets/cf821ff1-6539-4316-bfd6-088c84c4ced7)
+
+
+Leaderboard
+![WhatsApp Image 2025-08-04 at 23 34 14_26f780c1](https://github.com/user-attachments/assets/9e602412-871b-45c8-ad82-342ab91a9527)
+
+
+Learning Hub
+![WhatsApp Image 2025-08-04 at 23 34 13_2a0413a7](https://github.com/user-attachments/assets/a5ee3eef-d0cb-4961-b31b-1f4821ab25ca)
+
+
+AI advisor 
+![WhatsApp Image 2025-08-04 at 23 34 12_a718baed](https://github.com/user-attachments/assets/a6ed6db4-8dd7-4f11-930e-3d5cfe504163)
+
+
+
+Home Page (After adding transactions)
+
+
+
+
+## Video
+
+https://github.com/user-attachments/assets/f4422cd4-8d6f-498b-9870-fce390b12af8
+
+
+
 ## Getting Started
 
 1. **Clone the repository:**
