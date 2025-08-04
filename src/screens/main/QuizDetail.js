@@ -203,7 +203,7 @@ export default function QuizDetail({ navigation, route }) {
         )}
 
         {currentStep === 'completed' && (
-          <Card style={styles.completedCard}>
+          <BrutalCard style={styles.completedCard}>
             <Text category='h5' style={styles.completedTitle}>🎉 Topic Completed!</Text>
             <Text category='p1' style={styles.completedText}>
               Congratulations! You've successfully completed {topicData.title}.
@@ -211,13 +211,13 @@ export default function QuizDetail({ navigation, route }) {
             <Text category='p2' style={styles.tokenEarned}>
               Tokens Earned: +{topic.tokenReward} AI Tokens
             </Text>
-            <Button 
+            <BrutalButton 
               style={styles.backToLearningButton}
               onPress={() => navigation.goBack()}
-            >
-              Back to Learning Hub
-            </Button>
-          </Card>
+              title="Back to Learning Hub"
+              variant="primary"
+            />
+          </BrutalCard>
         )}
       </ScrollView>
     </View>

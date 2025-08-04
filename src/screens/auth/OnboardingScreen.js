@@ -74,7 +74,7 @@ export default function OnboardingScreen({ navigation }) {
             style={styles.skipButton}
           />
           <BrutalButton 
-            title={currentSlide === onboardingData.length - 1 ? 'UNLEASH THE POWER' : 'NEXT'}
+            title={currentSlide === onboardingData.length - 1 ? 'Go!' : 'NEXT'}
             onPress={nextSlide}
             style={styles.nextButton}
           />

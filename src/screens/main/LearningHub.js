@@ -88,7 +88,7 @@ export default function LearningHub({ navigation }) {
                 AI TOKENS: {getAITokens()}
               </Text>
               <Text style={brutalTextStyle('caption', 'medium', 'gray')}>
-                READ TOPICS AND COMPLETE QUIZZES TO EARN MORE!
+                READ TOPICS & COMPLETE QUIZZES TO EARN MORE
               </Text>
             </View>
           </View>

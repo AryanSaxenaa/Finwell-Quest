@@ -58,12 +58,21 @@ export default function BudgetManagement({ navigation }) {
     }
   };
 
+
   const BudgetDetailCard = ({ budget }) => {
     const [editLimit, setEditLimit] = useState(budget.limit.toString());
     const [isEditing, setIsEditing] = useState(false);
 
+    // Keep editLimit in sync with budget.limit changes
+    React.useEffect(() => {
+      setEditLimit(budget.limit.toString());
+    }, [budget.limit]);
+
     const handleSaveLimit = () => {
-      setBudgetLimit(budget.category, parseFloat(editLimit));
+      const parsed = parseFloat(editLimit);
+      if (!isNaN(parsed)) {
+        setBudgetLimit(budget.category, parsed);
+      }
       setIsEditing(false);
     };
 
@@ -345,6 +354,10 @@ const styles = StyleSheet.create({
   },
   editInput: {
     flex: 1,
+    minHeight: 48,
+    fontSize: 18,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   backdrop: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

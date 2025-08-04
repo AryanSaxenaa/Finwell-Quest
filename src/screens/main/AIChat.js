@@ -15,6 +15,7 @@ import {
   BrutalHeader,
   BrutalIllustration 
 } from '../../components/BrutalComponents';
+import { getAIResponse } from '../../services/aiService';
 
 const SendIcon = (props) => <Ionicons name="paper-plane-outline" size={24} color="white" />;
 
@@ -53,7 +54,7 @@ export default function AIChat({ navigation }) {
     },
   ];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!message.trim()) return;
 
     // Check if user has tokens
@@ -75,7 +76,6 @@ export default function AIChat({ navigation }) {
       return;
     }
 
-    // Use a token
     useAIToken();
 
     // Add user message
@@ -86,63 +86,42 @@ export default function AIChat({ navigation }) {
       timestamp: new Date().toISOString(),
     });
 
-    // Simulate AI response based on mode and context
-    setTimeout(() => {
-      let response = '';
-      
-      // Get real spending insights if Plaid is connected
-      const spendingInsights = isPlaidConnected ? getSpendingInsights() : null;
-      
-      const generateContextualResponse = () => {
-        if (spendingInsights) {
-          const { 
-            weeklySpent, 
-            monthlySpent, 
-            topSpendingCategory, 
-            topSpendingAmount, 
-            averageDailySpending,
-            recentTransactions 
-          } = spendingInsights;
-
-          switch (aiMode) {
-            case 'advisor':
-              return `Based on your real transaction data: You've spent $${weeklySpent.toFixed(2)} this week and $${monthlySpent.toFixed(2)} this month. Your top spending category is ${topSpendingCategory} at $${topSpendingAmount.toFixed(2)}. Your daily average is $${averageDailySpending.toFixed(2)}. Consider setting a budget for ${topSpendingCategory} to better manage your finances. Your game level ${level} shows great learning progress!`;
-              
-            case 'hype':
-              return `YO! Level ${level}?! That's LEGENDARY! 🔥 I see you've been spending $${weeklySpent.toFixed(2)} this week - you're living your life! Your ${topSpendingCategory} game is strong at $${topSpendingAmount.toFixed(2)}! But let's channel that energy into SMASHING your savings goals! You're a financial WARRIOR! 💪`;
-              
-            case 'roast':
-              return `Oh look who's at level ${level} but spent $${weeklySpent.toFixed(2)} this week! 😏 $${topSpendingAmount.toFixed(2)} on ${topSpendingCategory}? Really? At $${averageDailySpending.toFixed(2)} per day, you're treating money like Monopoly cash! Time to put those game skills to work on your REAL budget! 🎯`;
-              
-            default:
-              return `You've spent $${weeklySpent.toFixed(2)} this week with most going to ${topSpendingCategory}.`;
-          }
-        } else {
-          // Fallback for manual expense tracking
-          const context = `User has spent $${totalSpent} this month, level ${level}, score ${score}`;
-          
-          switch (aiMode) {
-            case 'advisor':
-              return `Based on your logged expenses of $${totalSpent} this month, I'd recommend reviewing your budget categories. Your game level ${level} shows you're learning well! Consider connecting your bank account for more personalized insights.`;
-            case 'hype':
-              return `YO! Level ${level}?! That's FIRE! 🔥 Keep crushing those financial goals! Your $${totalSpent} spending this month shows you're tracking your money like a BOSS!`;
-            case 'roast':
-              return `$${totalSpent} this month and only manual tracking? Come on! At level ${level}, I expected you to have your bank connected by now! Step up your money game! 😤`;
-            default:
-              return `Based on your expenses and game progress, here's my advice...`;
-          }
-        }
+    // Gather context for AI
+    let contextData = {};
+    if (isPlaidConnected && typeof getSpendingInsights === 'function') {
+      contextData = getSpendingInsights() || {};
+    } else {
+      contextData = {
+        totalSpent,
+        level,
+        score,
+        expenses,
       };
+    }
 
-      response = generateContextualResponse();
+    // Compose chat history for AI
+    const messages = [
+      ...chatHistory,
+      { role: 'user', text: message }
+    ].map(m => ({
+      role: m.sender === 'user' ? 'user' : 'ai',
+      text: m.text
+    }));
 
-      addMessage({
-        id: Date.now() + 1,
-        text: response,
-        sender: 'ai',
-        timestamp: new Date().toISOString(),
-      });
-    }, 1000);
+    // Call Google AI
+    let aiText = '...';
+    try {
+      aiText = await getAIResponse(messages, { aiMode, ...contextData });
+    } catch (e) {
+      aiText = 'Sorry, I could not process your request.';
+    }
+
+    addMessage({
+      id: Date.now() + 1,
+      text: aiText,
+      sender: 'ai',
+      timestamp: new Date().toISOString(),
+    });
 
     setMessage('');
   };

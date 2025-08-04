@@ -135,7 +135,7 @@ export default function HomeDashboard({ navigation }) {
           ) : (
             <View style={styles.emptyStateContainer}>
               <BrutalIllustration
-                source={require('../../../assets/icon.png')}
+                source={require('../../../assets/SharkWithSuitcase.png')}
                 size="large"
                 style={styles.emptyStateIllustration}
               />
@@ -319,7 +319,7 @@ export default function HomeDashboard({ navigation }) {
             ) : (
               <View style={styles.emptyBudgetState}>
                 <BrutalIllustration
-                  source={require('../../../assets/icon.png')}
+                  source={require('../../../assets/SharkWithSuitcase.png')}
                   size="medium"
                   style={styles.emptyBudgetIllustration}
                 />
