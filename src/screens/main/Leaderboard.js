@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Layout, Text, ListItem, TopNavigation } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 const TrophyIcon = (props) => <Ionicons name="trophy" size={20} color="#FFD700" />;
@@ -37,8 +38,9 @@ export default function Leaderboard({ navigation }) {
   };
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation title='Global Leaderboard' alignment='center' />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation title='Global Leaderboard' alignment='center' style={styles.topNavigation} />
       
       <ScrollView style={styles.content}>
         <Text category='h6' style={styles.title}>Top Players</Text>
@@ -47,10 +49,19 @@ export default function Leaderboard({ navigation }) {
         </View>
       </ScrollView>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

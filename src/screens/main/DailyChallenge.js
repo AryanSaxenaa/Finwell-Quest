@@ -9,6 +9,7 @@ import {
   Button,
   Divider
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 import { QUESTIONS_DATABASE } from '../../utils/questions';
@@ -207,12 +208,14 @@ export default function DailyChallenge({ navigation }) {
   }
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation
-        title='Daily Challenge'
-        alignment='center'
-        accessoryLeft={renderBackAction}
-      />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation
+          title='Daily Challenge'
+          alignment='center'
+          accessoryLeft={renderBackAction}
+          style={styles.topNavigation}
+        />
       
       <View style={styles.content}>
         <Card style={styles.challengeHeader}>
@@ -277,10 +280,19 @@ export default function DailyChallenge({ navigation }) {
         </Card>
       </View>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

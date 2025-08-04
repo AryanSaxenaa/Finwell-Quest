@@ -12,6 +12,7 @@ import {
   Button,
   TopNavigation
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { PieChart } from 'react-native-chart-kit';
 import { useExpenseStore, useBudgetStore } from '../../store';
@@ -65,19 +66,20 @@ export default function HomeDashboard({ navigation }) {
   };
 
   return (
-    <Layout style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Ionicons name="notifications-outline" size={24} color="#6B7280" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>FinPath</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('SocialTab', { screen: 'Profile' })}>
-          <View style={styles.profileButton}>
-            <Text style={styles.profileInitial}>A</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity>
+            <Ionicons name="notifications-outline" size={24} color="#6B7280" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>FinPath</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('SocialTab', { screen: 'Profile' })}>
+            <View style={styles.profileButton}>
+              <Text style={styles.profileInitial}>A</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Spending Overview Section */}
@@ -256,11 +258,16 @@ export default function HomeDashboard({ navigation }) {
         visible={showAddExpense}
         onClose={() => setShowAddExpense(false)}
       />
-    </Layout>
+      </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',

@@ -8,6 +8,7 @@ import {
   TopNavigation,
   TopNavigationAction 
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 
@@ -74,14 +75,14 @@ export default function GameResults({ navigation }) {
   if (gameStats.totalGamesPlayed >= 5) badges.push({ name: 'Dedicated Player', icon: '🏅' });
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation 
-        title='Game Results' 
-        alignment='center'
-        accessoryLeft={renderBackAction}
-      />
-      
-      <View style={styles.content}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation
+          title='Game Results'
+          alignment='center'
+          accessoryLeft={renderBackAction}
+          style={styles.topNavigation}
+        />      <View style={styles.content}>
         {/* Performance Card */}
         <Card style={styles.performanceCard}>
           <Text style={styles.performanceIcon}>{performance.icon}</Text>
@@ -184,10 +185,19 @@ export default function GameResults({ navigation }) {
         </View>
       </View>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

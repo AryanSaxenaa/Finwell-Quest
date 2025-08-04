@@ -9,6 +9,7 @@ import {
   TopNavigationAction,
   Modal
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 
@@ -233,11 +234,13 @@ export default function GameBoard({ navigation }) {
   }
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation
-        title='Game Board'
-        accessoryLeft={renderBackAction}
-      />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation
+          title='Game Board'
+          accessoryLeft={renderBackAction}
+          style={styles.topNavigation}
+        />
       
       <View style={styles.content}>
         <Card style={styles.statsCard}>
@@ -347,10 +350,19 @@ export default function GameBoard({ navigation }) {
         </Modal>
       </View>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

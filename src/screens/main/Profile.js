@@ -10,6 +10,7 @@ import {
   Toggle,
   Avatar
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore, useGameStore } from '../../store';
 
@@ -47,8 +48,9 @@ export default function Profile({ navigation }) {
   };
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation title='Profile & Settings' alignment='center' />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation title='Profile & Settings' alignment='center' style={styles.topNavigation} />
       
       <ScrollView style={styles.content}>
         <Card style={styles.profileCard}>
@@ -124,10 +126,19 @@ export default function Profile({ navigation }) {
         </Button>
       </ScrollView>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

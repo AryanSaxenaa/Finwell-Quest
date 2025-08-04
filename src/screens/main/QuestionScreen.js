@@ -10,6 +10,7 @@ import {
   Radio,
   RadioGroup 
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 import { getRandomQuestion } from '../../utils/questions';
@@ -105,11 +106,13 @@ export default function QuestionScreen({ navigation, route }) {
 
   if (showResult) {
     return (
-      <Layout style={styles.container}>
-        <TopNavigation
-          title='Result'
-          accessoryLeft={renderBackAction}
-        />
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <Layout style={styles.container}>
+          <TopNavigation
+            title='Result'
+            accessoryLeft={renderBackAction}
+            style={styles.topNavigation}
+          />
         <View style={styles.resultContainer}>
           <Animated.View style={[
             styles.resultCard, 
@@ -180,29 +183,35 @@ export default function QuestionScreen({ navigation, route }) {
           </Animated.View>
         </View>
       </Layout>
+      </SafeAreaView>
     );
   }
 
   if (!question) {
     return (
-      <Layout style={styles.container}>
-        <TopNavigation
-          title='Loading...'
-          accessoryLeft={renderBackAction}
-        />
-        <View style={styles.content}>
-          <Text>Loading question...</Text>
-        </View>
-      </Layout>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <Layout style={styles.container}>
+          <TopNavigation
+            title='Loading...'
+            accessoryLeft={renderBackAction}
+            style={styles.topNavigation}
+          />
+          <View style={styles.content}>
+            <Text>Loading question...</Text>
+          </View>
+        </Layout>
+      </SafeAreaView>
     );
   }
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation
-        title='Question'
-        accessoryLeft={renderBackAction}
-      />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation
+          title='Question'
+          accessoryLeft={renderBackAction}
+          style={styles.topNavigation}
+        />
       
       <View style={styles.content}>
         <Card style={styles.progressCard}>
@@ -278,10 +287,19 @@ export default function QuestionScreen({ navigation, route }) {
         </View>
       </View>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

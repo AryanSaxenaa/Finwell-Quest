@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Layout, Text, TopNavigation, TopNavigationAction, Card, Button } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 
@@ -132,11 +133,13 @@ export default function QuizDetail({ navigation, route }) {
   );
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation
-        title={topicData.title}
-        accessoryLeft={renderBackAction}
-      />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation
+          title={topicData.title}
+          accessoryLeft={renderBackAction}
+          style={styles.topNavigation}
+        />
       
       <ScrollView style={styles.content}>
         {currentStep === 'content' && (
@@ -209,10 +212,19 @@ export default function QuizDetail({ navigation, route }) {
         )}
       </ScrollView>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

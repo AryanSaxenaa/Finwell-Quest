@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Layout, Text, Button, Card, TopNavigation, ListItem } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGameStore } from '../../store';
 
 const learningTopics = [
@@ -27,8 +28,9 @@ export default function LearningHub({ navigation }) {
     navigation.navigate('QuizDetail', { topic });
   };
   return (
-    <Layout style={styles.container}>
-      <TopNavigation title='Learning Hub' alignment='center' />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation title='Learning Hub' alignment='center' style={styles.topNavigation} />
       
       <ScrollView style={styles.content}>
         {/* Token Display Card */}
@@ -68,10 +70,19 @@ export default function LearningHub({ navigation }) {
         </Card>
       </ScrollView>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

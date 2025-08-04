@@ -9,6 +9,7 @@ import {
   TopNavigation,
   ButtonGroup 
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useChatStore, useExpenseStore, useGameStore } from '../../store';
 
@@ -137,8 +138,9 @@ export default function AIChat({ navigation }) {
   );
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation title='AI Assistant' alignment='center' />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation title='AI Assistant' alignment='center' style={styles.topNavigation} />
       
       <KeyboardAvoidingView 
         style={styles.content}
@@ -210,10 +212,19 @@ export default function AIChat({ navigation }) {
         </View>
       </KeyboardAvoidingView>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',

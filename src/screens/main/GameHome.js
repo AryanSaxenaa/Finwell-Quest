@@ -7,6 +7,7 @@ import {
   Button, 
   TopNavigation
 } from '@ui-kitten/components';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGameStore } from '../../store';
 
@@ -87,11 +88,13 @@ export default function GameHome({ navigation }) {
   );
 
   return (
-    <Layout style={styles.container}>
-      <TopNavigation
-        title='Game Center'
-        alignment='center'
-      />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Layout style={styles.container}>
+        <TopNavigation
+          title='Game Center'
+          alignment='center'
+          style={styles.topNavigation}
+        />
       
       {/* Top Section with Level Progress and Leaderboard */}
       <View style={styles.topSection}>
@@ -181,10 +184,19 @@ export default function GameHome({ navigation }) {
         </Card>
       </ScrollView>
     </Layout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  topNavigation: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',
