@@ -22,33 +22,29 @@ const { width } = Dimensions.get('window');
 export default function HomeDashboard({ navigation }) {
   const [showAddExpense, setShowAddExpense] = useState(false);
   
-  const { totalSpent, getExpensesByCategory } = useExpenseStore();
+  const { 
+    totalSpent, 
+    getExpensesByCategory, 
+    isPlaidConnected, 
+    getSpendingInsights 
+  } = useExpenseStore();
   const { getBudgetSummary } = useBudgetStore();
   
   const categoryData = getExpensesByCategory().filter(item => item.total > 0);
   const budgetSummary = getBudgetSummary();
+  const spendingInsights = isPlaidConnected ? getSpendingInsights() : null;
 
-  // Sample data for demonstration (matching the reference design)
-  const sampleExpenseData = [
-    { name: 'Food', amount: 450, color: '#FF6B8A' },
-    { name: 'Transport', amount: 200, color: '#4F9CF9' },
-    { name: 'Shopping', amount: 300, color: '#36C5F0' },
-    { name: 'Utilities', amount: 150, color: '#F59E0B' },
-    { name: 'Others', amount: 150, color: '#8B5CF6' },
-  ];
+  // Only show data if user has real expenses or is connected to bank
+  const hasRealData = categoryData.length > 0 || isPlaidConnected;
+  
+  // Color palette for expense categories
+  const categoryColors = ['#FF6B8A', '#4F9CF9', '#36C5F0', '#F59E0B', '#8B5CF6', '#10B981', '#F97316'];
 
-  const sampleBudgetData = [
-    { name: 'Groceries', spent: 250, limit: 300 },
-    { name: 'Transport', spent: 120, limit: 150 },
-    { name: 'Entertainment', spent: 80, limit: 100 },
-    { name: 'Utilities', spent: 100, limit: 100 },
-  ];
-
-  const displayData = categoryData.length > 0 ? categoryData.map((item, index) => ({
+  const displayData = hasRealData ? categoryData.map((item, index) => ({
     name: item.category,
     amount: item.total,
-    color: sampleExpenseData[index % sampleExpenseData.length]?.color || '#8B5CF6'
-  })) : sampleExpenseData;
+    color: categoryColors[index % categoryColors.length]
+  })) : [];
 
   const totalAmount = displayData.reduce((sum, item) => sum + item.amount, 0);
 
@@ -96,42 +92,93 @@ export default function HomeDashboard({ navigation }) {
 
           {/* Doughnut Chart */}
           <View style={styles.chartContainer}>
-            <View style={styles.chartWrapper}>
-              <PieChart
-                data={pieChartData}
-                width={210}
-                height={210}
-                chartConfig={chartConfig}
-                accessor="population"
-                backgroundColor="transparent"
-                paddingLeft="53"
-                center={[0, 0]}
-                absolute={false}
-                hasLegend={false}
-                avoidFalseZero={true}
-              />
-              {/* White center overlay for doughnut effect */}
-              <View style={styles.doughnutOverlay}>
-                <View style={styles.chartCenter}>
-                  <Text style={styles.chartCenterLabel}>Total Spent</Text>
-                  <Text style={styles.chartCenterAmount}>${totalAmount.toLocaleString()}</Text>
+            {hasRealData ? (
+              <View style={styles.chartWrapper}>
+                <PieChart
+                  data={pieChartData}
+                  width={210}
+                  height={210}
+                  chartConfig={chartConfig}
+                  accessor="population"
+                  backgroundColor="transparent"
+                  paddingLeft="53"
+                  center={[0, 0]}
+                  absolute={false}
+                  hasLegend={false}
+                  avoidFalseZero={true}
+                />
+                {/* White center overlay for doughnut effect */}
+                <View style={styles.doughnutOverlay}>
+                  <View style={styles.chartCenter}>
+                    <Text style={styles.chartCenterLabel}>Total Spent</Text>
+                    <Text style={styles.chartCenterAmount}>${totalAmount.toLocaleString()}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
+            ) : (
+              <View style={styles.emptyStateContainer}>
+                <Ionicons name="pie-chart-outline" size={64} color="#E5E7EB" />
+                <Text style={styles.emptyStateTitle}>No Expenses Yet</Text>
+                <Text style={styles.emptyStateSubtitle}>
+                  Connect your bank account or add expenses manually to see your spending overview
+                </Text>
+              </View>
+            )}
           </View>
 
-          {/* Category Legend */}
-          <View style={styles.categoryLegend}>
-            {displayData.map((item, index) => (
-              <View key={index} style={styles.legendItem}>
-                <View style={styles.legendLeft}>
-                  <View style={[styles.legendDot, { backgroundColor: item.color }]} />
-                  <Text style={styles.legendLabel}>{item.name}</Text>
+          {/* Bank Connection Status */}
+          {!isPlaidConnected ? (
+            <View style={styles.bankConnectionCard}>
+              <View style={styles.bankConnectionContent}>
+                <Ionicons name="business" size={24} color="#4CAF50" />
+                <View style={styles.bankConnectionText}>
+                  <Text style={styles.bankConnectionTitle}>Connect Your Bank</Text>
+                  <Text style={styles.bankConnectionSubtitle}>
+                    Get automatic expense tracking and personalized insights
+                  </Text>
                 </View>
-                <Text style={styles.legendAmount}>${item.amount}</Text>
+                <Button
+                  size="small"
+                  onPress={() => navigation.navigate('BankConnection')}
+                >
+                  Connect
+                </Button>
               </View>
-            ))}
-          </View>
+            </View>
+          ) : spendingInsights && (
+            <View style={styles.insightsCard}>
+              <Text style={styles.insightsTitle}>This Week's Insights</Text>
+              <View style={styles.insightsRow}>
+                <Text style={styles.insightsLabel}>Weekly Spending:</Text>
+                <Text style={styles.insightsValue}>${spendingInsights.weeklySpent.toFixed(2)}</Text>
+              </View>
+              <View style={styles.insightsRow}>
+                <Text style={styles.insightsLabel}>Top Category:</Text>
+                <Text style={styles.insightsValue}>
+                  {spendingInsights.topSpendingCategory} (${spendingInsights.topSpendingAmount.toFixed(2)})
+                </Text>
+              </View>
+              <View style={styles.insightsRow}>
+                <Text style={styles.insightsLabel}>Daily Average:</Text>
+                <Text style={styles.insightsValue}>${spendingInsights.averageDailySpending.toFixed(2)}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Category Legend */}
+          {hasRealData && (
+            <View style={styles.categoryLegend}>
+              {displayData.map((item, index) => (
+                <View key={index} style={styles.legendItem}>
+                  <View style={styles.legendLeft}>
+                    <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+                    <Text style={styles.legendLabel}>{item.name}</Text>
+                  </View>
+                  <Text style={styles.legendAmount}>${item.amount}</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           <Button
             style={styles.addExpenseButton}
@@ -159,14 +206,12 @@ export default function HomeDashboard({ navigation }) {
 
           {/* Budget Items */}
           <View style={styles.budgetCardsContainer}>
-            {sampleBudgetData.map((budget, index) => {
-              const percentage = (budget.spent / budget.limit) * 100;
-              const isOverBudget = percentage > 100;
-              return (
-                <View key={index} style={styles.budgetCard}>
+            {budgetSummary.length > 0 ? (
+              budgetSummary.map((budget, index) => (
+                <View key={budget.id || index} style={styles.budgetCard}>
                   <View style={styles.budgetCardContent}>
                     <View style={styles.budgetCardLeft}>
-                      <Text style={styles.budgetCardCategory}>{budget.name}</Text>
+                      <Text style={styles.budgetCardCategory}>{budget.category}</Text>
                     </View>
                     <View style={styles.budgetCardRight}>
                       <Text style={styles.budgetCardAmount}>
@@ -175,8 +220,16 @@ export default function HomeDashboard({ navigation }) {
                     </View>
                   </View>
                 </View>
-              );
-            })}
+              ))
+            ) : (
+              <View style={styles.emptyBudgetState}>
+                <Ionicons name="wallet-outline" size={48} color="#E5E7EB" />
+                <Text style={styles.emptyBudgetTitle}>No Budgets Set</Text>
+                <Text style={styles.emptyBudgetSubtitle}>
+                  Create budgets to track your spending goals
+                </Text>
+              </View>
+            )}
           </View>
 
           <Button
@@ -436,5 +489,97 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
+  },
+  bankConnectionCard: {
+    backgroundColor: '#E8F5E8',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
+  },
+  bankConnectionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bankConnectionText: {
+    flex: 1,
+    marginLeft: 12,
+    marginRight: 12,
+  },
+  bankConnectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginBottom: 4,
+  },
+  bankConnectionSubtitle: {
+    fontSize: 14,
+    color: '#4CAF50',
+  },
+  insightsCard: {
+    backgroundColor: '#F0F4F8',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2196F3',
+  },
+  insightsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1976D2',
+    marginBottom: 12,
+  },
+  insightsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  insightsLabel: {
+    fontSize: 14,
+    color: '#455A64',
+  },
+  insightsValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1976D2',
+  },
+  emptyStateContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#6B7280',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyStateSubtitle: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  emptyBudgetState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+  },
+  emptyBudgetTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#6B7280',
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  emptyBudgetSubtitle: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
   },
 });

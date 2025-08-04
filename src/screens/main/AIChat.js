@@ -17,7 +17,12 @@ const SendIcon = (props) => <Ionicons name="paper-plane-outline" size={24} color
 export default function AIChat({ navigation }) {
   const [message, setMessage] = useState('');
   const { chatHistory, aiMode, addMessage, setAIMode } = useChatStore();
-  const { totalSpent, expenses } = useExpenseStore();
+  const { 
+    totalSpent, 
+    expenses, 
+    isPlaidConnected, 
+    getSpendingInsights 
+  } = useExpenseStore();
   const { score, level, aiTokens, useAIToken, hasAITokens } = useGameStore();
 
   const aiModes = [
@@ -62,19 +67,52 @@ export default function AIChat({ navigation }) {
     // Simulate AI response based on mode and context
     setTimeout(() => {
       let response = '';
-      const context = `User has spent $${totalSpent} this month, level ${level}, score ${score}`;
       
-      switch (aiMode) {
-        case 'advisor':
-          response = `Based on your spending of $${totalSpent} this month, I'd recommend reviewing your budget categories. Your game level ${level} shows you're learning well!`;
-          break;
-        case 'hype':
-          response = `YO! Level ${level}?! That's FIRE! 🔥 Keep crushing those financial goals! Your $${totalSpent} spending this month is data for SUCCESS!`;
-          break;
-        case 'roast':
-          response = `$${totalSpent} this month? Really? At level ${level}, I thought you'd know better! Time to get serious about that budget! 😤`;
-          break;
-      }
+      // Get real spending insights if Plaid is connected
+      const spendingInsights = isPlaidConnected ? getSpendingInsights() : null;
+      
+      const generateContextualResponse = () => {
+        if (spendingInsights) {
+          const { 
+            weeklySpent, 
+            monthlySpent, 
+            topSpendingCategory, 
+            topSpendingAmount, 
+            averageDailySpending,
+            recentTransactions 
+          } = spendingInsights;
+
+          switch (aiMode) {
+            case 'advisor':
+              return `Based on your real transaction data: You've spent $${weeklySpent.toFixed(2)} this week and $${monthlySpent.toFixed(2)} this month. Your top spending category is ${topSpendingCategory} at $${topSpendingAmount.toFixed(2)}. Your daily average is $${averageDailySpending.toFixed(2)}. Consider setting a budget for ${topSpendingCategory} to better manage your finances. Your game level ${level} shows great learning progress!`;
+              
+            case 'hype':
+              return `YO! Level ${level}?! That's LEGENDARY! 🔥 I see you've been spending $${weeklySpent.toFixed(2)} this week - you're living your life! Your ${topSpendingCategory} game is strong at $${topSpendingAmount.toFixed(2)}! But let's channel that energy into SMASHING your savings goals! You're a financial WARRIOR! 💪`;
+              
+            case 'roast':
+              return `Oh look who's at level ${level} but spent $${weeklySpent.toFixed(2)} this week! 😏 $${topSpendingAmount.toFixed(2)} on ${topSpendingCategory}? Really? At $${averageDailySpending.toFixed(2)} per day, you're treating money like Monopoly cash! Time to put those game skills to work on your REAL budget! 🎯`;
+              
+            default:
+              return `You've spent $${weeklySpent.toFixed(2)} this week with most going to ${topSpendingCategory}.`;
+          }
+        } else {
+          // Fallback for manual expense tracking
+          const context = `User has spent $${totalSpent} this month, level ${level}, score ${score}`;
+          
+          switch (aiMode) {
+            case 'advisor':
+              return `Based on your logged expenses of $${totalSpent} this month, I'd recommend reviewing your budget categories. Your game level ${level} shows you're learning well! Consider connecting your bank account for more personalized insights.`;
+            case 'hype':
+              return `YO! Level ${level}?! That's FIRE! 🔥 Keep crushing those financial goals! Your $${totalSpent} spending this month shows you're tracking your money like a BOSS!`;
+            case 'roast':
+              return `$${totalSpent} this month and only manual tracking? Come on! At level ${level}, I expected you to have your bank connected by now! Step up your money game! 😤`;
+            default:
+              return `Based on your expenses and game progress, here's my advice...`;
+          }
+        }
+      };
+
+      response = generateContextualResponse();
 
       addMessage({
         id: Date.now() + 1,
