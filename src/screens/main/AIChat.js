@@ -261,7 +261,7 @@ export default function AIChat({ navigation }) {
                 START CHATTING!
               </Text>
               <Text style={brutalTextStyle('caption', 'medium', 'gray')}>
-                ASK YOUR AI FINANCIAL ASSISTANT ANYTHING!
+                ASK  AI
               </Text>
             </View>
           ) : (

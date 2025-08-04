@@ -78,7 +78,7 @@ export default function HomeDashboard({ navigation }) {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <Layout style={styles.container}>
         <BrutalHeader 
-          title="💰 FINPATH QUEST"
+          title="      FINPATH QUEST"
           textColor="white"
           rightAction={
             <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
@@ -386,6 +386,9 @@ const styles = StyleSheet.create({
   // Overview Card
   overviewCard: {
     marginBottom: NeoBrutalism.spacing.xl, // Increased from md to xl for more space
+    borderWidth: 0, // No border
+    borderColor: 'transparent',
+    // backgroundColor remains unchanged
   },
   overviewHeader: {
     flexDirection: 'row',
@@ -447,6 +450,8 @@ const styles = StyleSheet.create({
   insightsCard: {
     marginTop: NeoBrutalism.spacing.xs, // Reduced from sm to xs
     marginBottom: NeoBrutalism.spacing.lg, // Increased from sm to lg
+    borderWidth: 0, // No border
+    borderColor: 'transparent',
   },
   insightsTitle: {
     marginBottom: NeoBrutalism.spacing.sm, // Reduced from md to sm
@@ -512,6 +517,8 @@ const styles = StyleSheet.create({
   // Budget Section
   budgetSection: {
     marginVertical: NeoBrutalism.spacing.md,
+    borderWidth: 0, // No border
+    borderColor: 'transparent',
   },
   budgetHeader: {
     flexDirection: 'row',
@@ -525,7 +532,8 @@ const styles = StyleSheet.create({
   brutalBudgetCard: {
     padding: NeoBrutalism.spacing.md,
     backgroundColor: NeoBrutalism.colors.lightGray,
-    borderWidth: 0, // Removed black border
+    borderWidth: 0, // No border
+    borderColor: 'transparent',
     marginBottom: NeoBrutalism.spacing.sm,
   },
   overspentBudgetCard: {

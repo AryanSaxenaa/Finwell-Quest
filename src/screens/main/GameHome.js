@@ -105,8 +105,8 @@ export default function GameHome({ navigation }) {
             size="small"
             style={styles.compactLevelButton}
             icon={<Ionicons name="trophy" size={20} color={NeoBrutalism.colors.black} />}
+            textStyle={{ fontSize: 13 }}
           />
-          
           <BrutalButton
             title="LEADERBOARD"
             variant="secondary"
@@ -114,6 +114,7 @@ export default function GameHome({ navigation }) {
             onPress={() => navigation.navigate('Leaderboard')}
             style={styles.compactLeaderboardButton}
             icon={<Ionicons name="podium" size={20} color={NeoBrutalism.colors.black} />}
+            textStyle={{ fontSize: 13 }}
           />
         </View>
         
@@ -159,29 +160,11 @@ export default function GameHome({ navigation }) {
           />
         </View>
 
-        <DailyChallengeCard />
+        <>
+          <DailyChallengeCard />
+          <View style={{ height: 40 }} />
+        </>
 
-        <BrutalCard style={styles.achievementsCard}>
-          <Text style={brutalTextStyle('h6', 'bold', 'black')}>GAME STATISTICS</Text>
-          <View style={styles.achievementsList}>
-            <View style={styles.achievementItem}>
-              <Text style={brutalTextStyle('caption', 'medium', 'gray')}>GAMES PLAYED</Text>
-              <Text style={brutalTextStyle('h6', 'bold', 'black')}>{gameStats.totalGamesPlayed}</Text>
-            </View>
-            <View style={styles.achievementItem}>
-              <Text style={brutalTextStyle('caption', 'medium', 'gray')}>ACCURACY</Text>
-              <Text style={brutalTextStyle('h6', 'bold', 'black')}>
-                {gameStats.totalQuestionsAnswered > 0 
-                  ? Math.round((gameStats.totalCorrectAnswers / gameStats.totalQuestionsAnswered) * 100)
-                  : 0}%
-              </Text>
-            </View>
-            <View style={styles.achievementItem}>
-              <Text style={brutalTextStyle('caption', 'medium', 'gray')}>BEST STREAK</Text>
-              <Text style={brutalTextStyle('h6', 'bold', 'black')}>{gameStats.streaks?.longestStreak || 0}</Text>
-            </View>
-          </View>
-        </BrutalCard>
       </ScrollView>
     </Layout>
     </SafeAreaView>
@@ -220,18 +203,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderColor: '#E4E9F2',
     borderWidth: 1,
-  levelText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#2E384D',
-    marginLeft: 6,
-  },shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
   },
   levelInfo: {
     flexDirection: 'row',
@@ -343,6 +314,8 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     marginHorizontal: 4,
+    borderWidth: 0, // Remove border
+    borderColor: 'transparent',
   },
   statContent: {
     flexDirection: 'row',
@@ -370,24 +343,24 @@ const styles = StyleSheet.create({
   },
   xpProgressBar: {
     height: 8,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 4,
-    marginBottom: 8,
-    overflow: 'hidden',
-  },
-  xpProgressFill: {
-    height: '100%',
-    backgroundColor: '#6C5CE7',
-    borderRadius: 4,
-  },
-  xpText: {
-    textAlign: 'center',
-    color: '#6C5CE7',
-    fontWeight: '500',
-  },
-  challengeCard: {
-    marginBottom: 16,
-    backgroundColor: '#FFD700',
+    backgroundColor: '#FFF',
+    borderColor: '#E4E9F2',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 0, // Reduced by 2
+    paddingRight: 18, // Reduced by 2
+    paddingVertical: 6, // Reduced by 2
+    minHeight: 42, // Reduced by 2
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: {
@@ -415,23 +388,24 @@ const styles = StyleSheet.create({
     color: '#2E384D',
   },
   challengeButton: {
-    backgroundColor: '#2E384D',
-    borderColor: '#2E384D',
-  },
-  completedButton: {
-    backgroundColor: '#8F9BB3',
-    borderColor: '#8F9BB3',
-  },
-  challengeReward: {
-    color: '#FFD700',
-    fontWeight: 'bold',
-  },
-  achievementsCard: {
-    marginBottom: 16,
-  },
-  achievementsTitle: {
-    marginBottom: 16,
-    fontWeight: 'bold',
+    backgroundColor: '#FFF',
+    borderColor: '#E4E9F2',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 16, // Reduced by 2
+    paddingRight: 15, // Reduced by 2
+    paddingVertical: 6, // Reduced by 2
+    minHeight: 42, // Reduced by 2
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   achievementsList: {
     flexDirection: 'row',
