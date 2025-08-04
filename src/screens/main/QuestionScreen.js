@@ -416,7 +416,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 16,
     paddingHorizontal: 8,
   },
@@ -425,6 +426,8 @@ const styles = StyleSheet.create({
     minHeight: 50,
     borderWidth: 3,
     borderColor: NeoBrutalism.colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   submitButton: {
     flex: 0.6,

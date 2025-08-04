@@ -252,11 +252,6 @@ export default function AIChat({ navigation }) {
         >
           {chatHistory.length === 0 ? (
             <View style={styles.emptyChatCard}>
-              <BrutalIllustration
-                source={require('../../../assets/icon.png')}
-                size="large"
-                style={[styles.emptyChatIcon, { borderWidth: 0 }]}
-              />
               <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.emptyChatTitle]}>
                 START CHATTING!
               </Text>
@@ -274,7 +269,7 @@ export default function AIChat({ navigation }) {
           <View style={styles.inputWrapper}>
             <Input
               style={styles.input}
-              placeholder="ASK ABOUT YOUR FINANCES..."
+              placeholder="ASK AI"
               value={message}
               onChangeText={setMessage}
               onSubmitEditing={handleSend}

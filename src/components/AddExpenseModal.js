@@ -78,7 +78,7 @@ export default function AddExpenseModal({ visible, onClose }) {
     >
       <View style={styles.container}>
           <BrutalCard style={styles.header}>
-            <Text style={brutalTextStyle('h5', 'bold', 'white')}>💰 ADD EXPENSE</Text>
+            <Text style={brutalTextStyle('h5', 'bold', 'white')}> ADD EXPENSE</Text>
             <BrutalButton
               title="✕"
               variant="secondary"
@@ -166,7 +166,7 @@ export default function AddExpenseModal({ visible, onClose }) {
           style={styles.categoryModal}
         >
           <BrutalCard style={styles.categoryContainer}>
-            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.categoryTitle]}>📊 SELECT CATEGORY</Text>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.categoryTitle]}> SELECT CATEGORY</Text>
             <View style={styles.categoryScrollContainer}>
               {categories.map((category, index) => (
                 <TouchableOpacity
@@ -174,7 +174,7 @@ export default function AddExpenseModal({ visible, onClose }) {
                   style={styles.categoryOption}
                   onPress={() => handleCategorySelect(index)}
                 >
-                  <Text style={brutalTextStyle('body', 'medium', 'black')}>{category.toUpperCase()}</Text>
+                  <Text style={[brutalTextStyle('body', 'medium', 'black'), { fontSize: 8 }]}>{category.toUpperCase()}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -189,7 +189,7 @@ export default function AddExpenseModal({ visible, onClose }) {
           style={styles.inputModal}
         >
           <BrutalCard style={styles.inputContainer}>
-            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.inputTitle]}>💰 ENTER AMOUNT</Text>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.inputTitle]}> ENTER AMOUNT</Text>
             <TextInput
               style={styles.textInput}
               value={tempAmount}
@@ -222,7 +222,7 @@ export default function AddExpenseModal({ visible, onClose }) {
           style={styles.inputModal}
         >
           <BrutalCard style={styles.inputContainer}>
-            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.inputTitle]}>📝 ENTER DESCRIPTION</Text>
+            <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.inputTitle]}> ENTER DESCRIPTION</Text>
             <TextInput
               style={styles.textInput}
               value={tempDescription}
