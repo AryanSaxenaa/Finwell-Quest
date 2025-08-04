@@ -37,8 +37,7 @@ export default function LoginScreen({ navigation }) {
     }
 
     setLoading(true);
-    
-    // Simulate API call
+    // Simulate credential check (replace with real API call in production)
     setTimeout(() => {
       login({ email, name: 'User' });
       setLoading(false);

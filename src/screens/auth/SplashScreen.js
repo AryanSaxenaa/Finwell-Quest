@@ -24,13 +24,13 @@ export default function SplashScreen({ navigation }) {
     <Layout style={styles.container}>
       <View style={styles.logoContainer}>
         <Text style={brutalTextStyle('h1', 'bold', 'black')}>FINPATH</Text>
-        <Text style={brutalTextStyle('h1', 'bold', 'neonYellow')}>QUEST</Text>
+        <Text style={brutalTextStyle('h1', 'bold', 'darkBlue')}>QUEST</Text>
       </View>
       <Text style={[brutalTextStyle('h6', 'bold', 'black'), styles.subtitle]}>
         YOUR FINANCIAL JOURNEY STARTS HERE
       </Text>
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={NeoBrutalism.colors.neonYellow} />
+        <ActivityIndicator size="large" color={NeoBrutalism.colors.darkBlue} />
         <Text style={[brutalTextStyle('body', 'bold', 'black'), styles.loadingText]}>
           LOADING...
         </Text>

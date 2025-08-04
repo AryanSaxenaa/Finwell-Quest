@@ -47,8 +47,7 @@ export default function RegisterScreen({ navigation }) {
     }
 
     setLoading(true);
-    
-    // Simulate API call
+    // Simulate registration (replace with real API call in production)
     setTimeout(() => {
       login({ email, name, username });
       setLoading(false);

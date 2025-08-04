@@ -1,146 +1,127 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
-import { Text, Input } from '@ui-kitten/components';
+
+import { View, StyleSheet } from 'react-native';
+import { Text, Input, Button } from '@ui-kitten/components';
 import { BrutalCard, BrutalButton, brutalTextStyle } from '../../components/BrutalComponents';
 import { NeoBrutalism } from '../../styles/neoBrutalism';
+import { sendOTP, verifyOTP } from '../../services/twoFactorService';
 
-export default function TwoFactorScreen({ navigation }) {
-  const [code, setCode] = useState('');
-  const [timer, setTimer] = useState(60);
-  const [canResend, setCanResend] = useState(false);
+export default function TwoFactorScreen({ navigation, route }) {
+  // Accept email and onVerified callback from navigation params
+  const passedEmail = route?.params?.email || '';
+  const onVerified = route?.params?.onVerified;
+  const [email, setEmail] = useState(passedEmail);
+  const [otp, setOTP] = useState('');
+  const [step, setStep] = useState(passedEmail ? 'otp' : 'email');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          setCanResend(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleVerify = () => {
-    if (code.length === 6) {
-      // Simulate verification
-      navigation.navigate('Main');
+  const handleSendOTP = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      await sendOTP(email);
+      setStep('otp');
+      setSuccess('OTP sent to your email!');
+    } catch (e) {
+      setError(e.toString());
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleResend = () => {
-    setTimer(60);
-    setCanResend(false);
-    // Implement resend logic
+  // Auto-send OTP if email is passed
+  useEffect(() => {
+    if (passedEmail) {
+      handleSendOTP();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passedEmail]);
+
+  const handleVerifyOTP = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      await verifyOTP(email, otp);
+      setSuccess('OTP verified! 2FA complete.');
+      if (onVerified) {
+        onVerified();
+      }
+      navigation.navigate('Main');
+    } catch (e) {
+      setError(e.toString());
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={[brutalTextStyle.title, styles.title]}>VERIFY ACCOUNT</Text>
-        <Text style={[brutalTextStyle.body, styles.subtitle]}>
-          ENTER THE 6-DIGIT BATTLEFIELD CODE
-        </Text>
-
-        <BrutalCard style={styles.codeContainer}>
+    <View style={styles.container}>
+      <Text category='h5' style={styles.title}>Two-Factor Authentication</Text>
+      {step === 'email' && (
+        <>
           <Input
+            label="Email"
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
             style={styles.input}
-            placeholder='XXXXXX'
-            value={code}
-            onChangeText={setCode}
-            keyboardType='numeric'
-            maxLength={6}
-            textAlign='center'
-            size='large'
-            textStyle={styles.codeInput}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
-
-          <BrutalButton
-            style={styles.verifyButton}
-            onPress={handleVerify}
-            disabled={code.length !== 6}
-          >
-            VERIFY CODE
-          </BrutalButton>
-
-          <BrutalButton
-            style={styles.resendButton}
-            variant="secondary"
-            onPress={handleResend}
-            disabled={!canResend}
-          >
-            {canResend ? 'RESEND CODE' : `RESEND IN ${timer}S`}
-          </BrutalButton>
-        </BrutalCard>
-
-        <BrutalButton
-          style={styles.backButton}
-          variant="outline"
-          onPress={() => navigation.navigate('Login')}
-        >
-          BACK TO LOGIN
-        </BrutalButton>
-      </View>
-    </SafeAreaView>
+          <Button onPress={handleSendOTP} disabled={loading || !email} style={styles.button}>
+            Send OTP
+          </Button>
+        </>
+      )}
+      {step === 'otp' && (
+        <>
+          <Input
+            label="OTP"
+            placeholder="Enter the OTP sent to your email"
+            value={otp}
+            onChangeText={setOTP}
+            style={styles.input}
+            keyboardType="numeric"
+            autoCapitalize="none"
+          />
+          <Button onPress={handleVerifyOTP} disabled={loading || !otp} style={styles.button}>
+            Verify OTP
+          </Button>
+        </>
+      )}
+      {!!error && <Text status='danger' style={styles.error}>{error}</Text>}
+      {!!success && <Text status='success' style={styles.success}>{success}</Text>}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: NeoBrutalism.colors.white,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
     justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#fff',
   },
   title: {
+    marginBottom: 24,
     textAlign: 'center',
-    marginBottom: 8,
-    color: NeoBrutalism.colors.black,
-    fontSize: 32,
-    fontWeight: '900',
-    textShadowColor: NeoBrutalism.colors.neonPink,
-    textShadowOffset: { width: 3, height: 3 },
-    textShadowRadius: 0,
-  },
-  subtitle: {
-    textAlign: 'center',
-    marginBottom: 40,
-    color: NeoBrutalism.colors.black,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  codeContainer: {
-    padding: 30,
-    marginBottom: 30,
-    backgroundColor: NeoBrutalism.colors.lightGray,
   },
   input: {
-    marginBottom: 30,
-    backgroundColor: NeoBrutalism.colors.white,
-    borderWidth: 4,
-    borderColor: NeoBrutalism.colors.black,
-    borderRadius: 0,
+    marginBottom: 16,
   },
-  codeInput: {
-    fontSize: 28,
-    fontWeight: '900',
+  button: {
+    marginBottom: 16,
+  },
+  error: {
+    marginTop: 8,
     textAlign: 'center',
-    letterSpacing: 8,
-    color: NeoBrutalism.colors.black,
   },
-  verifyButton: {
-    marginBottom: 20,
-  },
-  resendButton: {
-    marginBottom: 10,
-  },
-  backButton: {
-    alignSelf: 'center',
-    paddingHorizontal: 40,
+  success: {
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
